@@ -1,19 +1,23 @@
+import { Connection } from "@solana/web3.js";
+import { createAssetPoolLoader, TokenID } from "@apricot-lend/sdk-ts";
 import { AssetRate, ProtocolRates } from '../types';
 
 export async function fetch(): Promise<ProtocolRates> {
-  const url = "https://app.apricot.one/";
+  const connection = new Connection("https://api.mainnet-beta.solana.com", "processed");
+  const assetPoolLoader = await createAssetPoolLoader(connection);
 
-  const puppeteer = require("puppeteer");
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.goto(url, { timeout: 15000 });
-  await new Promise(resolve => setTimeout(resolve, 5000));
-  const content = await page.content();
-  await browser.close();
-
-  const cheerio = require("cheerio");
-  const $ = cheerio.load(content);
-  const rates: AssetRate[] = [];
+  const rates: AssetRate[] = (await Promise.all([
+    assetPoolLoader.getAssetPool(TokenID.BTC),
+    assetPoolLoader.getAssetPool(TokenID.ETH),
+    assetPoolLoader.getAssetPool(TokenID.SOL),
+    assetPoolLoader.getAssetPool(TokenID.USDC),
+  ])).map((assetPool) => {
+    return {
+      asset: assetPool?.tokenName,
+      deposit: assetPool?.depositRate,
+      borrow: assetPool?.borrowRate,
+    } as AssetRate;
+  });
 
   return {
     protocol: 'apricot',
