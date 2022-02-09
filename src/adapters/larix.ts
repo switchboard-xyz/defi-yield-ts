@@ -1,22 +1,48 @@
+import BigNumber from 'bignumber.js';
+import BN from "bn.js";
+import { Connection } from "@solana/web3.js"
+import { accrueInterest, getAllLendingReserve, refreshExchangeRate, refreshIndex } from "../larix/lendingReserveProvider";
+import { Detail, Reserve } from '../larix/models';
 import { AssetRate, ProtocolRates } from '../types';
 
+BigNumber.config({EXPONENTIAL_AT: 1e9});
+
 export async function fetch(): Promise<ProtocolRates> {
-  const url = "https://projectlarix.com/";
-
-  const puppeteer = require("puppeteer");
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.goto(url, { timeout: 15000 });
-  await new Promise(resolve => setTimeout(resolve, 5000));
-  const content = await page.content();
-  await browser.close();
-
-  const cheerio = require("cheerio");
-  const $ = cheerio.load(content);
-  const rates: AssetRate[] = [];
-
+  const reserves = await getLendingReserve();
+  const rates: AssetRate[] = reserves.filter((reserve) => { return isSupportedAsset(reserve.info.liquidity.name) && !reserve.info.isLP; }).map((reserve) => {
+    return {
+      asset: reserve.info.liquidity.name,
+      deposit: reserve.info.config.supplyYearCompoundedInterestRate.toNumber(),
+      borrow: reserve.info.config.borrowYearCompoundedInterestRate.toNumber(),
+    } as AssetRate;
+  });
   return {
     protocol: 'larix',
     rates,
   };
+}
+
+export async function getLendingReserve(){
+  const connection = new Connection("https://api.mainnet-beta.solana.com", "processed");
+  const reserveArrayInner = new Array<Detail<Reserve>>();
+  // @ts-ignore
+  const result = await Promise.all([
+    await connection.getSlot("finalized"),
+    getAllLendingReserve(connection, reserveArrayInner),
+  ]);
+  const currentSlot = new BN(result[0]);
+  accrueInterest(reserveArrayInner, currentSlot);
+  refreshIndex(reserveArrayInner, currentSlot);
+  refreshExchangeRate(reserveArrayInner);
+  return reserveArrayInner
+}
+
+function isSupportedAsset(asset: string): boolean {
+  switch (asset) {
+    case 'BTC': return true;
+    case 'ETH': return true;
+    case 'SOL': return true;
+    case 'USDC': return true;
+    default: return false;
+  }
 }
