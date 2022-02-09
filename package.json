@@ -6,38 +6,34 @@
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "build": "rm -rf dist/ && tsc",
-    "fetch": "yarn build && npx ts-node src/fetch.ts"
+    "test-apricot": "mocha -r ts-node/register test/apricot.test.ts --timeout 0",
+    "test-francium": "mocha -r ts-node/register test/francium.test.ts --timeout 0",
+    "test-jet": "mocha -r ts-node/register test/jet.test.ts --timeout 0",
+    "test-larix": "mocha -r ts-node/register test/larix.test.ts --timeout 0",
+    "test-mango": "mocha -r ts-node/register test/mango.test.ts --timeout 0",
+    "test-port": "mocha -r ts-node/register test/port.test.ts --timeout 0",
+    "test-solend": "mocha -r ts-node/register test/solend.test.ts --timeout 0",
+    "test-tulip": "mocha -r ts-node/register test/tulip.test.ts --timeout 0",
+    "test": "mocha -r ts-node/register test/**/*.test.ts --timeout 0"
   },
   "dependencies": {
-    "@project-serum/anchor": "^0.20.1",
-    "@project-serum/borsh": "^0.2.2",
-    "@solana/web3.js": "^1.17.0",
-    "axios": "^0.25.0",
-    "base64-js": "^1.5.1",
-    "bn.js": "^5.1.2",
-    "bs58": "^4.0.1",
-    "buffer-layout": "^1.2.2",
-    "camelcase": "^5.3.1",
+    "@blockworks-foundation/mango-client": "^3.3.13",
+    "@jet-lab/jet-engine": "^0.2.15",
+    "@project-serum/anchor": "^0.21.0",
+    "@solana/web3.js": "^1.33.0",
+    "@types/node": "^17.0.16",
+    "assert": "^2.0.0",
     "cheerio": "^1.0.0-rc.10",
-    "crypto-hash": "^1.3.0",
-    "eventemitter3": "^4.0.7",
-    "find": "^0.3.0",
-    "js-sha256": "^0.9.0",
-    "node-emoji": "^1.11.0",
-    "pako": "^2.0.3",
     "puppeteer": "^13.2.0",
-    "snake-case": "^3.0.4",
-    "toml": "^3.0.0",
-    "user-agents": "^1.0.921"
+    "user-agents": "^1.0.922"
   },
   "devDependencies": {
-    "@types/bs58": "^4.0.1",
-    "@types/crypto-hash": "^1.1.2",
-    "@types/node": "^17.0.16",
-    "@types/node-emoji": "^1.8.1",
-    "@types/pako": "^1.0.1",
-    "ts-node": "^9.0.0",
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^9.1.0",
+    "chai": "^4.3.6",
+    "mocha": "^9.2.0",
+    "ts-node": "^10.5.0",
     "tslib": "^2.3.1",
-    "typescript": "^4.5.2"
+    "typescript": "^4.5.5"
   }
 }

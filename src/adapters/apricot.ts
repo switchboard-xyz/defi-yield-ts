@@ -1,9 +1,9 @@
-const cheerio = require("cheerio");
-const puppeteer = require("puppeteer");
+import { AssetRate, ProtocolRates } from '../types';
 
-export async function fetch() {
+export async function fetch(): Promise<ProtocolRates> {
   const url = "https://app.apricot.one/";
 
+  const puppeteer = require("puppeteer");
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
   await page.goto(url, { timeout: 15000 });
@@ -11,10 +11,12 @@ export async function fetch() {
   const content = await page.content();
   await browser.close();
 
-  const rates = [];
+  const cheerio = require("cheerio");
+  const $ = cheerio.load(content);
+  const rates: AssetRate[] = [];
 
   return {
-    name: "Apricot",
+    protocol: 'apricot',
     rates,
   };
 }
