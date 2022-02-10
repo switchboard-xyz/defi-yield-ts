@@ -15,3 +15,14 @@ To pull rates for all supported protocols at once:
 const rateObserver = new RateObserver();
 const protocolRates: ProtocolRates[] = await rateObserver.fetchAll();
 ```
+
+Currently supported protocols:
+
+- 'apricot'
+- 'francium'
+- 'jet'
+- 'larix'
+- 'mango'
+- 'port'
+- 'solend'
+- 'tulip'
