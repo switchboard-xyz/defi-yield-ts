@@ -8,7 +8,8 @@ export type Protocol =
 | 'mango'
 | 'port'
 | 'solend'
-| 'tulip';
+| 'tulip'
+| '01';
 
 export type ProtocolRates = {
   protocol: Protocol;
