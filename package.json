@@ -6,6 +6,7 @@
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "build": "rm -rf dist/ && tsc",
+    "test-all": "mocha -r ts-node/register test/all.test.ts --timeout 0",
     "test-apricot": "mocha -r ts-node/register test/apricot.test.ts --timeout 0",
     "test-francium": "mocha -r ts-node/register test/francium.test.ts --timeout 0",
     "test-jet": "mocha -r ts-node/register test/jet.test.ts --timeout 0",
