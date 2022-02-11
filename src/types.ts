@@ -22,6 +22,8 @@ export type AssetRate = {
   mint: PublicKey;
   deposit: number | undefined;
   borrow: number | undefined;
+  //TODO totalDeposit: number | undefined;
+  //TODO totalBorrow: number | undefined;
 };
 
 export function toRate(rate: string): number {
