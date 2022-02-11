@@ -6,6 +6,7 @@ import * as mango from './adapters/mango';
 import * as port from './adapters/port';
 import * as solend from './adapters/solend';
 import * as tulip from './adapters/tulip';
+import * as zo from './adapters/zo';
 import { Protocol, ProtocolRates } from './types';
 
 export class RateObserver {
@@ -20,6 +21,7 @@ export class RateObserver {
       case 'port': return port.fetch();
       case 'solend': return solend.fetch();
       case 'tulip': return tulip.fetch();
+      case '01': return zo.fetch();
       default: throw new Error(`Invalid protocol: ${protocol}`);
     }
   }

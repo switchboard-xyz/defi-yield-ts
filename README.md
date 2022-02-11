@@ -18,6 +18,7 @@ const protocolRates: ProtocolRates[] = await rateObserver.fetchAll();
 
 Currently supported protocols:
 
+- '01'
 - 'apricot'
 - 'francium'
 - 'jet'
