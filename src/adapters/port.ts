@@ -1,59 +1,27 @@
+import { Connection } from "@solana/web3.js";
 import { Port, ReserveInfo } from "@port.finance/port-sdk";
-import { AssetRate, ProtocolRates, toRate } from '../types';
+import TOKENS from '../tokens.json';
+import { AssetRate, ProtocolRates } from '../types';
 
 export async function fetch(): Promise<ProtocolRates> {
-  const port = Port.forMainNet({});
+  const connection = new Connection('https://port-finance.rpcpool.com');
+  const port = Port.forMainNet({ connection });
   const context = await port.getReserveContext();
   const reserves: ReserveInfo[] = context.getAllReserves()
 
-  reserves[0].getBorrowApy()
-
-  /*
-  const url = "https://mainnet.port.finance/#/supply";
-
-  const puppeteer = require("puppeteer");
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.goto(url, { timeout: 15000 });
-  await new Promise(resolve => setTimeout(resolve, 5000));
-  const content = await page.content();
-  await browser.close();
-
-  const cheerio = require("cheerio");
-  const $ = cheerio.load(content);
-  const rates: AssetRate[] = $("tbody")
-    .children()
-    .map(function (i, el) {
+  const rates: AssetRate[] = reserves
+    .filter((reserve) => { return TOKENS.find((token) => { return token.mint === reserve.getAssetMintId().toBase58(); }); })
+    .map((reserve) => {
+      const token = TOKENS.find((token) => { return token.mint === reserve.getAssetMintId().toBase58(); });
       return {
-        asset: toAsset($(el).find("td:first-child span").text().trim()),
-        deposit: toRate($(el).find("td:last-child em").text().trim().replace(/\+$/, '')),
-      };
-    })
-    .toArray().filter((assetRate) => { return isSupportedAsset(assetRate.asset); });
-  */
-
-  const rates: AssetRate[] = [];
+        asset: token!.symbol,
+        deposit: reserve.getSupplyApy().getUnchecked().toNumber(),
+        borrow: reserve.getBorrowApy().getUnchecked().toNumber()
+      } as AssetRate;
+  });
 
   return {
     protocol: 'port',
     rates,
   };
-}
-
-function isSupportedAsset(asset: string): boolean {
-  switch (asset) {
-    case 'BTC': return true;
-    case 'SOL': return true;
-    case 'USDC': return true;
-    default: return false;
-  }
-}
-
-function toAsset(asset: string): string {
-  switch (asset) {
-    case 'Bitcoin': return 'BTC';
-    case 'Solana': return 'SOL';
-    case 'USD Coin': return 'USDC';
-    default: return asset;
-  }
 }
