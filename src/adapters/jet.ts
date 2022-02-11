@@ -1,7 +1,7 @@
 import { JetClient, JetMarket, JetReserve, JET_MARKET_ADDRESS } from "@jet-lab/jet-engine"
 import { Provider } from "@project-serum/anchor"
 import { Connection, PublicKey, Transaction } from "@solana/web3.js"
-import { Asset, AssetRate, ProtocolRates } from '../types';
+import { AssetRate, ProtocolRates } from '../types';
 
 export async function fetch(): Promise<ProtocolRates> {
   const options = Provider.defaultOptions();
@@ -16,6 +16,7 @@ export async function fetch(): Promise<ProtocolRates> {
   const rates: AssetRate[] = reserves.filter((reserve) => { return isSupportedAsset(reserve.data.productData.product.symbol); }).map((reserve) => {
     return {
       asset: toAsset(reserve.data.productData.product.symbol),
+      mint: reserve.data.tokenMint,
       deposit: reserve.data.depositApy,
       borrow: reserve.data.borrowApr,
     } as AssetRate;
@@ -37,7 +38,7 @@ function isSupportedAsset(asset: string): boolean {
   }
 }
 
-function toAsset(asset: string): Asset {
+function toAsset(asset: string): string {
   switch (asset) {
     case 'Crypto.BTC/USD': return 'BTC';
     case 'Crypto.ETH/USD': return 'ETH';

@@ -14,14 +14,15 @@ export async function fetch(): Promise<ProtocolRates> {
   const connection = new Connection(clusterUrl, 'singleGossip');
   const client = new MangoClient(connection, mangoProgramIdPk);
   const mangoGroup = await client.getMangoGroup(groupConfig.publicKey);
-  const rootBanks = await mangoGroup.loadRootBanks(connection);
+  await mangoGroup.loadRootBanks(connection);
 
   const rates: AssetRate[] = groupConfig.tokens.map((e) => {
     const tokenIndex = mangoGroup.getTokenIndex(e.mintKey);
     const borrowRate = mangoGroup.getBorrowRate(tokenIndex);
     const depositRate = mangoGroup.getDepositRate(tokenIndex);
     return {
-      asset: e.symbol,
+      asset: toAsset(e.symbol),
+      mint: new PublicKey(e.mintKey),
       deposit: depositRate.toNumber(),
       borrow: borrowRate.toNumber(),
     } as AssetRate;
@@ -31,4 +32,11 @@ export async function fetch(): Promise<ProtocolRates> {
     protocol: 'mango',
     rates,
   };
+}
+
+function toAsset(asset: string): string {
+  switch (asset) {
+    case 'MSOL': return 'mSOL';
+    default: return asset;
+  }
 }

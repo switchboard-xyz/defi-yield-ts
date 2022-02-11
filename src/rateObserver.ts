@@ -1,3 +1,5 @@
+import { token } from "@project-serum/anchor/dist/cjs/utils";
+import { PublicKey } from "@solana/web3.js"
 import * as apricot from './adapters/apricot';
 import * as francium from './adapters/francium';
 import * as jet from './adapters/jet';
@@ -7,6 +9,7 @@ import * as port from './adapters/port';
 import * as solend from './adapters/solend';
 import * as tulip from './adapters/tulip';
 import * as zo from './adapters/zo';
+import TOKENS from './tokens.json';
 import { Protocol, ProtocolRates } from './types';
 
 export class RateObserver {
@@ -37,6 +40,10 @@ export class RateObserver {
       this.fetch('solend'),
       this.fetch('tulip'),
     ]);
+  }
+
+  isSupportedToken(symbol: string, mint: PublicKey): boolean {
+    return TOKENS.find((token) => { return token.symbol === symbol && token.mint === mint.toBase58(); }) != undefined;
   }
 
 }

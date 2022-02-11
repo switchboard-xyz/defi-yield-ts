@@ -11,7 +11,8 @@ export async function fetch(): Promise<ProtocolRates> {
   const reserves = await getLendingReserve();
   const rates: AssetRate[] = reserves.filter((reserve) => { return !reserve.info.isLP; }).map((reserve) => {
     return {
-      asset: reserve.info.liquidity.name,
+      asset: toAsset(reserve.info.liquidity.name),
+      mint: reserve.info.liquidity.mintPubkey,
       deposit: reserve.info.config.supplyYearCompoundedInterestRate.toNumber(),
       borrow: reserve.info.config.borrowYearCompoundedInterestRate.toNumber(),
     } as AssetRate;
@@ -20,6 +21,14 @@ export async function fetch(): Promise<ProtocolRates> {
     protocol: 'larix',
     rates,
   };
+}
+
+function toAsset(asset: string): string {
+  switch (asset) {
+    case 'stSOL': return 'Lido Staked SOL';
+    case 'weWETH': return 'Ether (Wormhole)';
+    default: return asset;
+  }
 }
 
 export async function getLendingReserve(){

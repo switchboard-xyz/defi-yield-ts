@@ -9,6 +9,7 @@ describe('Solend', () => {
     const protocolRates: ProtocolRates = await rateObserver.fetch('solend');
     assert.isTrue(protocolRates.protocol === 'solend');
     assert.isTrue(protocolRates.rates.length > 0);
+    protocolRates.rates.forEach((rate) => { assert.isTrue(rateObserver.isSupportedToken(rate.asset, rate.mint)); })
   });
 
 });

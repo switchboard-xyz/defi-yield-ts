@@ -1,3 +1,5 @@
+import { PublicKey } from "@solana/web3.js"
+import TOKENS from '../tokens.json';
 import { AssetRate, ProtocolRates, toRate } from '../types';
 
 export async function fetch(): Promise<ProtocolRates> {
@@ -13,19 +15,24 @@ export async function fetch(): Promise<ProtocolRates> {
 
   const cheerio = require("cheerio");
   const $ = cheerio.load(content);
-  const rates: AssetRate[] = $(".ant-table-row").map((i, el) => {
-    return {
-      // @ts-ignore
-      asset: toAsset($(el).find("td div").first().text()),
-      // @ts-ignore
-      deposit: toRate($(el).find("td div p").first().text()),
-    };
-  }).toArray();
+  let rates: AssetRate[] = [];
+  $(".ant-table-row").map((i, el) => {
+    const asset: string = toAsset($(el).find("td div").first().text());
+    const token = TOKENS.find((token) => { return token.symbol === asset; });
+    if (token) {
+      rates.push({
+        asset: token.symbol,
+        mint: new PublicKey(token.mint),
+        deposit: toRate($(el).find("td div p").first().text()),
+        borrow: undefined,
+      });
+    }
+  });
 
   return {
     protocol: 'francium',
     rates,
-  };
+  } as ProtocolRates;
 }
 
 function toAsset(asset: string): string {

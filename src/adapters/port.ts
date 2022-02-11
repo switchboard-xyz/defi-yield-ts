@@ -1,4 +1,4 @@
-import { Connection } from "@solana/web3.js";
+import { Connection, PublicKey } from "@solana/web3.js"
 import { Port, ReserveInfo } from "@port.finance/port-sdk";
 import TOKENS from '../tokens.json';
 import { AssetRate, ProtocolRates } from '../types';
@@ -16,6 +16,7 @@ export async function fetch(): Promise<ProtocolRates> {
       if (token) {
         return {
           asset: token!.symbol,
+          mint: new PublicKey(token!.mint),
           deposit: reserve.getSupplyApy().getUnchecked().toNumber(),
           borrow: reserve.getBorrowApy().getUnchecked().toNumber()
         } as AssetRate;

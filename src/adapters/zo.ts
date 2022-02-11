@@ -23,6 +23,7 @@ export async function fetch(): Promise<ProtocolRates> {
   const rates: AssetRate[] = Object.values(state.assets).map(a => {
     return {
       asset: a.symbol,
+      mint: new PublicKey(a.mint),
       deposit: a.supplyApy,
       borrow: a.borrowsApy
     } as AssetRate

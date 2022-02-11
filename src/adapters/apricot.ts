@@ -1,4 +1,4 @@
-import { Connection } from "@solana/web3.js";
+import { Connection, PublicKey } from "@solana/web3.js";
 import { createAssetPoolLoader, TokenID } from "@apricot-lend/sdk-ts";
 import TOKENS from '../tokens.json';
 import { AssetRate, ProtocolRates } from '../types';
@@ -24,6 +24,7 @@ export async function fetch(): Promise<ProtocolRates> {
     const token = TOKENS.find((token) => { return token.mint === assetPool?.mintKey.toBase58(); })
     return {
       asset: token!.symbol,
+      mint: new PublicKey(token!.mint),
       deposit: assetPool?.depositRate,
       borrow: assetPool?.borrowRate,
     } as AssetRate;

@@ -1,4 +1,5 @@
 import { assert } from "console";
+import { PublicKey } from "@solana/web3.js"
 
 export type Protocol =
 | 'apricot'
@@ -16,15 +17,9 @@ export type ProtocolRates = {
   rates: AssetRate[];
 };
 
-export type Asset =
-| 'BTC'
-| 'ETH'
-| 'SOL'
-| 'USDC'
-| 'USDT';
-
 export type AssetRate = {
-  asset: Asset;
+  asset: string;
+  mint: PublicKey;
   deposit: number | undefined;
   borrow: number | undefined;
 };

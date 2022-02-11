@@ -1,3 +1,6 @@
+import { token } from "@project-serum/anchor/dist/cjs/utils";
+import { PublicKey } from "@solana/web3.js"
+import TOKENS from '../tokens.json';
 import { AssetRate, ProtocolRates, toRate } from '../types';
 
 export async function fetch(): Promise<ProtocolRates> {
@@ -15,16 +18,22 @@ export async function fetch(): Promise<ProtocolRates> {
 
   const cheerio = require("cheerio");
   const $ = cheerio.load(content);
-  const rates: AssetRate[] = $(".lend-table__row-item").map((i, el) => {
-    return {
-      // @ts-ignore
-      asset: $(el).find(".lend-table__row-item__asset__text-name").contents()[0].data,
-      deposit: toRate($(el).find(".lend-table__row-item__cell span span").first().text() + "%"),
-    };
-  }).toArray();
+  let rates: AssetRate[] = [];
+  $(".lend-table__row-item").map((i, el) => {
+    const asset: string = $(el).find(".lend-table__row-item__asset__text-name").contents()[0].data;
+    const token = TOKENS.find((token) => { return token.symbol === asset; });
+    if (token) {
+      rates.push({
+        asset: token.symbol,
+        mint: new PublicKey(token.mint),
+        deposit: toRate($(el).find(".lend-table__row-item__cell span span").first().text() + "%"),
+        borrow: undefined,
+      });
+    }
+  });
 
   return {
     protocol: 'tulip',
     rates,
-  };
+  } as ProtocolRates;
 }

@@ -9,6 +9,7 @@ describe('Jet', () => {
     const protocolRates: ProtocolRates = await rateObserver.fetch('jet');
     assert.isTrue(protocolRates.protocol === 'jet');
     assert.isTrue(protocolRates.rates.length > 0);
+    protocolRates.rates.forEach((rate) => { assert.isTrue(rateObserver.isSupportedToken(rate.asset, rate.mint)); })
   });
 
 });
