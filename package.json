@@ -15,6 +15,7 @@
     "test-port": "mocha -r ts-node/register test/port.test.ts --timeout 0",
     "test-solend": "mocha -r ts-node/register test/solend.test.ts --timeout 0",
     "test-tulip": "mocha -r ts-node/register test/tulip.test.ts --timeout 0",
+    "test-01": "mocha -r ts-node/register test/zo.test.ts --timeout 0",
     "test": "mocha -r ts-node/register test/**/*.test.ts --timeout 0"
   },
   "dependencies": {
@@ -24,6 +25,7 @@
     "@project-serum/anchor": "^0.21.0",
     "@solana/web3.js": "^1.33.0",
     "@types/node": "^17.0.16",
+    "@zero_one/client": "^0.8.3",
     "assert": "^2.0.0",
     "bignumber": "^1.1.0",
     "bignumber.js": "^9.0.2",
