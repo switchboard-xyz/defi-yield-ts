@@ -2,6 +2,7 @@ import { Connection } from "@solana/web3.js";
 import { Port, ReserveInfo } from "@port.finance/port-sdk";
 import TOKENS from '../tokens.json';
 import { AssetRate, ProtocolRates } from '../types';
+import { token } from "@project-serum/anchor/dist/cjs/utils";
 
 export async function fetch(): Promise<ProtocolRates> {
   const connection = new Connection('https://port-finance.rpcpool.com');
@@ -10,15 +11,16 @@ export async function fetch(): Promise<ProtocolRates> {
   const reserves: ReserveInfo[] = context.getAllReserves()
 
   const rates: AssetRate[] = reserves
-    .filter((reserve) => { return TOKENS.find((token) => { return token.mint === reserve.getAssetMintId().toBase58(); }); })
     .map((reserve) => {
       const token = TOKENS.find((token) => { return token.mint === reserve.getAssetMintId().toBase58(); });
-      return {
-        asset: token!.symbol,
-        deposit: reserve.getSupplyApy().getUnchecked().toNumber(),
-        borrow: reserve.getBorrowApy().getUnchecked().toNumber()
-      } as AssetRate;
-  });
+      if (token) {
+        return {
+          asset: token!.symbol,
+          deposit: reserve.getSupplyApy().getUnchecked().toNumber(),
+          borrow: reserve.getBorrowApy().getUnchecked().toNumber()
+        } as AssetRate;
+      }
+  }).filter((token) => { return token != undefined; }).map((token) => { return token as AssetRate; });
 
   return {
     protocol: 'port',
