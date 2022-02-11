@@ -25,20 +25,10 @@ export async function fetch(): Promise<ProtocolRates> {
       deposit: depositRate.toNumber(),
       borrow: borrowRate.toNumber(),
     } as AssetRate;
-  }).filter((assetRate) => { return isSupportedAsset(assetRate.asset); });
+  });
 
   return {
     protocol: 'mango',
     rates,
   };
-}
-
-function isSupportedAsset(asset: string): boolean {
-  switch (asset) {
-    case 'BTC': return true;
-    case 'ETH': return true;
-    case 'SOL': return true;
-    case 'USDC': return true;
-    default: return false;
-  }
 }
