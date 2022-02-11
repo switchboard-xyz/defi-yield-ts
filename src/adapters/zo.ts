@@ -1,7 +1,7 @@
-import {AssetRate, ProtocolRates } from "src/types";
-import {Cluster, createProgram, State} from "@zero_one/client";
 import {Connection, PublicKey, Transaction} from "@solana/web3.js";
 import {Provider, utils} from "@project-serum/anchor";
+import {Cluster, createProgram, State} from "@zero_one/client";
+import {AssetRate, ProtocolRates} from "src/types";
 
 export async function fetch(): Promise<ProtocolRates> {
   const options = Provider.defaultOptions();
@@ -20,7 +20,7 @@ export async function fetch(): Promise<ProtocolRates> {
   );
   const state: State = await State.load(program, globalState.state);
 
-  const rates: AssetRate[] = Object.values(state.assets).filter(a => {return isSupportedAsset(a.symbol)}).map(a => {
+  const rates: AssetRate[] = Object.values(state.assets).map(a => {
     return {
       asset: a.symbol,
       deposit: a.supplyApy,
@@ -31,16 +31,6 @@ export async function fetch(): Promise<ProtocolRates> {
   return {
     protocol: "01",
     rates
-  }
-}
-
-function isSupportedAsset(asset: string): boolean {
-  switch (asset) {
-    case 'BTC': return true;
-    case 'ETH': return true;
-    case 'SOL': return true;
-    case 'USDC': return true;
-    default: return false;
   }
 }
 
