@@ -1,6 +1,14 @@
+import { Port, ReserveInfo } from "@port.finance/port-sdk";
 import { AssetRate, ProtocolRates, toRate } from '../types';
 
 export async function fetch(): Promise<ProtocolRates> {
+  const port = Port.forMainNet({});
+  const context = await port.getReserveContext();
+  const reserves: ReserveInfo[] = context.getAllReserves()
+
+  reserves[0].getBorrowApy()
+
+  /*
   const url = "https://mainnet.port.finance/#/supply";
 
   const puppeteer = require("puppeteer");
@@ -22,6 +30,9 @@ export async function fetch(): Promise<ProtocolRates> {
       };
     })
     .toArray().filter((assetRate) => { return isSupportedAsset(assetRate.asset); });
+  */
+
+  const rates: AssetRate[] = [];
 
   return {
     protocol: 'port',
