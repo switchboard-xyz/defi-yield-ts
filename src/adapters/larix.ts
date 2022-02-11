@@ -9,7 +9,7 @@ BigNumber.config({EXPONENTIAL_AT: 1e9});
 
 export async function fetch(): Promise<ProtocolRates> {
   const reserves = await getLendingReserve();
-  const rates: AssetRate[] = reserves.filter((reserve) => { return isSupportedAsset(reserve.info.liquidity.name) && !reserve.info.isLP; }).map((reserve) => {
+  const rates: AssetRate[] = reserves.filter((reserve) => { return !reserve.info.isLP; }).map((reserve) => {
     return {
       asset: reserve.info.liquidity.name,
       deposit: reserve.info.config.supplyYearCompoundedInterestRate.toNumber(),
@@ -35,14 +35,4 @@ export async function getLendingReserve(){
   refreshIndex(reserveArrayInner, currentSlot);
   refreshExchangeRate(reserveArrayInner);
   return reserveArrayInner
-}
-
-function isSupportedAsset(asset: string): boolean {
-  switch (asset) {
-    case 'BTC': return true;
-    case 'ETH': return true;
-    case 'SOL': return true;
-    case 'USDC': return true;
-    default: return false;
-  }
 }
