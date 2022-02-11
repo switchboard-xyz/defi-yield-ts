@@ -16,11 +16,11 @@ export async function fetch(): Promise<ProtocolRates> {
   const rates: AssetRate[] = $(".ant-table-row").map((i, el) => {
     return {
       // @ts-ignore
-      asset: $(el).find("td div").first().text(),
+      asset: toAsset($(el).find("td div").first().text()),
       // @ts-ignore
       deposit: toRate($(el).find("td div p").first().text()),
     };
-  }).toArray().filter((assetRate) => { return isSupportedAsset(assetRate.asset); });
+  }).toArray();
 
   return {
     protocol: 'francium',
@@ -28,12 +28,9 @@ export async function fetch(): Promise<ProtocolRates> {
   };
 }
 
-function isSupportedAsset(asset: string): boolean {
+function toAsset(asset: string): string {
   switch (asset) {
-    case 'BTC': return true;
-    case 'ETH': return true;
-    case 'SOL': return true;
-    case 'USDC': return true;
-    default: return false;
+    case 'weWETH (whETH)': return "whETH";
+    default: return asset;
   }
 }
