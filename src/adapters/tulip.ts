@@ -21,20 +21,10 @@ export async function fetch(): Promise<ProtocolRates> {
       asset: $(el).find(".lend-table__row-item__asset__text-name").contents()[0].data,
       deposit: toRate($(el).find(".lend-table__row-item__cell span span").first().text() + "%"),
     };
-  }).toArray().filter((assetRate) => { return isSupportedAsset(assetRate.asset); });
+  }).toArray();
 
   return {
     protocol: 'tulip',
     rates,
   };
-}
-
-function isSupportedAsset(asset: string): boolean {
-  switch (asset) {
-    case 'BTC': return true;
-    case 'ETH': return true;
-    case 'SOL': return true;
-    case 'USDC': return true;
-    default: return false;
-  }
 }
