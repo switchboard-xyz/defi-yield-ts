@@ -1,5 +1,5 @@
-import { token } from "@project-serum/anchor/dist/cjs/utils";
 import { PublicKey } from "@solana/web3.js"
+
 import TOKENS from '../tokens.json';
 import { AssetRate, ProtocolRates, toRate } from '../types';
 

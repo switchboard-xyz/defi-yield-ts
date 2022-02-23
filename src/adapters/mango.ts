@@ -1,5 +1,6 @@
 import { Config, IDS, MangoClient } from '@blockworks-foundation/mango-client';
 import { Connection, PublicKey } from '@solana/web3.js';
+
 import { AssetRate, ProtocolRates } from '../types';
 
 export async function fetch(): Promise<ProtocolRates> {
