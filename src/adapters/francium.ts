@@ -5,6 +5,7 @@ import { AssetRate, ProtocolRates, toRate } from '../types';
 export async function fetch(): Promise<ProtocolRates> {
   const url = "https://francium.io/app/lend";
 
+  /*
   const puppeteer = require("puppeteer");
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
@@ -28,6 +29,8 @@ export async function fetch(): Promise<ProtocolRates> {
       });
     }
   });
+  */
+  const rates: AssetRate[] = [];
 
   return {
     protocol: 'francium',

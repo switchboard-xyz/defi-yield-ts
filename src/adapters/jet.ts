@@ -5,7 +5,7 @@ import { AssetRate, ProtocolRates } from '../types';
 
 export async function fetch(): Promise<ProtocolRates> {
   const options = Provider.defaultOptions();
-  const connection = new Connection("https://api.mainnet-beta.solana.com", options);
+  const connection = new Connection("https://jetprotocol.genesysgo.net/", options);
   const wallet = new Wallet();
   const provider = new Provider(connection, wallet, options);
   const client = await JetClient.connect(provider, true);

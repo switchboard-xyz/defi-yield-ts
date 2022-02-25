@@ -1,4 +1,4 @@
-import { assert } from "console";
+import assert from "assert";
 import { PublicKey } from "@solana/web3.js"
 
 export type Protocol =

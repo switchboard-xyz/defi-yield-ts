@@ -1,13 +1,14 @@
 import BigNumber from 'bignumber.js';
 import BN from "bn.js";
 import { Connection } from "@solana/web3.js"
-import { accrueInterest, getAllLendingReserve, refreshExchangeRate, refreshIndex } from "../larix/lendingReserveProvider";
-import { Detail, Reserve } from '../larix/models';
+//import { accrueInterest, getAllLendingReserve, refreshExchangeRate, refreshIndex } from "../larix/lendingReserveProvider";
+//import { Detail, Reserve } from '../larix/models';
 import { AssetRate, ProtocolRates } from '../types';
 
 BigNumber.config({EXPONENTIAL_AT: 1e9});
 
 export async function fetch(): Promise<ProtocolRates> {
+  /*
   const reserves = await getLendingReserve();
   const rates: AssetRate[] = reserves.filter((reserve) => { return !reserve.info.isLP; }).map((reserve) => {
     return {
@@ -17,12 +18,16 @@ export async function fetch(): Promise<ProtocolRates> {
       borrow: reserve.info.config.borrowYearCompoundedInterestRate.toNumber(),
     } as AssetRate;
   });
+  */
+  const rates: AssetRate[] = [];
+
   return {
     protocol: 'larix',
     rates,
   };
 }
 
+/*
 function toAsset(asset: string): string {
   switch (asset) {
     case 'stSOL': return 'Lido Staked SOL';
@@ -45,3 +50,4 @@ export async function getLendingReserve(){
   refreshExchangeRate(reserveArrayInner);
   return reserveArrayInner
 }
+*/

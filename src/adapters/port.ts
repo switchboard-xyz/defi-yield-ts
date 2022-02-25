@@ -1,7 +1,7 @@
+import assert from "assert";
 import Big, { BigSource, Comparison } from "big.js";
 import BN from "bn.js";
-//TODO
-import { TransactionEnvelope, Provider } from "@saberhq/solana-contrib";
+import { Provider } from "@project-serum/anchor"
 import * as BufferLayout from "@solana/buffer-layout";
 import { AccountLayout, NATIVE_MINT, TOKEN_PROGRAM_ID, u64 } from "@solana/spl-token";
 import { ENV, TokenInfo } from "@solana/spl-token-registry";
@@ -182,7 +182,7 @@ export abstract class Comparable<C extends Comparable<C>> {
   protected abstract isCompatibleWith(that: C): boolean;
 
   protected checkCompatible(that: C): void {
-    console.assert(this.isCompatibleWith(that));
+    assert(this.isCompatibleWith(that));
   }
 
   private checkAndCompare(that: C): Comparison {
@@ -600,8 +600,8 @@ export class QuantityContext {
   }
 
   public static fromDecimals(decimals: number): QuantityContext {
-    console.assert(Number.isInteger(decimals));
-    console.assert(decimals >= 0);
+    assert(Number.isInteger(decimals));
+    assert(decimals >= 0);
     return new QuantityContext(decimals, new Big(10).pow(decimals));
   }
 }
@@ -791,7 +791,7 @@ export class Share extends Token<Share> {
   }
 
   public toAsset(exchangeRatio: AssetExchangeRate): Asset {
-    console.assert(this.getMintId().equals(exchangeRatio.getShareMintId()));
+    assert(this.getMintId().equals(exchangeRatio.getShareMintId()));
 
     if (!exchangeRatio.isPresent()) {
       return Asset.zero(exchangeRatio.getAssetMintId());
@@ -865,7 +865,7 @@ export class Asset extends Token<Asset> {
     price: AssetPrice,
     quantityContext: QuantityContext
   ): QuoteValue {
-    console.assert(
+    assert(
       this.getMintId().equals(price.getMintId()),
       `asset id: ${this.getMintId()} price id: ${price.getMintId()}`
     );
@@ -888,7 +888,7 @@ export class Asset extends Token<Asset> {
   }
 
   public toShare(exchangeRatio: AssetExchangeRate): Share {
-    console.assert(this.getMintId().equals(exchangeRatio.getAssetMintId()));
+    assert(this.getMintId().equals(exchangeRatio.getAssetMintId()));
 
     if (!exchangeRatio.isPresent()) {
       return Share.zero(exchangeRatio.getShareMintId());
@@ -2386,7 +2386,7 @@ export class Port {
   }
 
   public static forMainNet({
-    connection = new Connection("https://api.mainnet-beta.solana.com"),
+    connection = new Connection("https://port-finance.rpcpool.com"),
     profile = Environment.forMainNet(),
     lendingMarket = DEFAULT_PORT_LENDING_MARKET,
   }: {
@@ -2668,6 +2668,7 @@ export class Port {
     );
   }
 
+  /*
   private async createAccount({
     provider,
     space,
@@ -2695,6 +2696,8 @@ export class Port {
     );
     return [tx, newAccount.publicKey];
   }
+  */
+
 }
 
 
@@ -2762,8 +2765,8 @@ export class AssetPriceConfig {
   }
 
   public static fromDecimals(decimals: number): AssetPriceConfig {
-    console.assert(Number.isInteger(decimals));
-    console.assert(decimals >= 0);
+    assert(Number.isInteger(decimals));
+    assert(decimals >= 0);
     return new AssetPriceConfig(decimals, new Big(10).pow(decimals));
   }
 

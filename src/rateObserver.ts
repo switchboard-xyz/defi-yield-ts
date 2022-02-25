@@ -32,13 +32,13 @@ export class RateObserver {
   async fetchAll(): Promise<ProtocolRates[]> {
     return Promise.all([
       this.fetch('apricot'),
-      this.fetch('francium'),
+      //this.fetch('francium'),
       this.fetch('jet'),
-      this.fetch('larix'),
+      //this.fetch('larix'),
       this.fetch('mango'),
       this.fetch('port'),
       this.fetch('solend'),
-      this.fetch('tulip'),
+      //this.fetch('tulip'),
     ]);
   }
 
