@@ -1,11 +1,16 @@
-import { JetClient, JetMarket, JetReserve, JET_MARKET_ADDRESS } from "@jet-lab/jet-engine"
-import { Provider } from "@project-serum/anchor"
-import { Connection, PublicKey, Transaction } from "@solana/web3.js"
-import { AssetRate, ProtocolRates } from '../types';
+import {
+  JetClient,
+  JetMarket,
+  JetReserve,
+  JET_MARKET_ADDRESS,
+} from "@jet-lab/jet-engine";
+import { Provider } from "@project-serum/anchor";
+import { Connection, PublicKey, Transaction } from "@solana/web3.js";
+import { AssetRate, ProtocolRates } from "../types";
 
-export async function fetch(): Promise<ProtocolRates> {
+export async function fetch(url: string): Promise<ProtocolRates> {
   const options = Provider.defaultOptions();
-  const connection = new Connection("https://api.mainnet-beta.solana.com", options);
+  const connection = new Connection(url, options);
   const wallet = new Wallet();
   const provider = new Provider(connection, wallet, options);
   const client = await JetClient.connect(provider, true);
@@ -13,38 +18,52 @@ export async function fetch(): Promise<ProtocolRates> {
   const market = await JetMarket.load(client, JET_MARKET_ADDRESS);
   const reserves = await JetReserve.loadMultiple(client, market);
 
-  const rates: AssetRate[] = reserves.filter((reserve) => { return isSupportedAsset(reserve.data.productData.product.symbol); }).map((reserve) => {
-    return {
-      asset: toAsset(reserve.data.productData.product.symbol),
-      mint: reserve.data.tokenMint,
-      deposit: reserve.data.depositApy,
-      borrow: reserve.data.borrowApr,
-    } as AssetRate;
-  });
+  const rates: AssetRate[] = reserves
+    .filter((reserve) => {
+      return isSupportedAsset(reserve.data.productData.product.symbol);
+    })
+    .map((reserve) => {
+      return {
+        asset: toAsset(reserve.data.productData.product.symbol),
+        mint: reserve.data.tokenMint,
+        deposit: reserve.data.depositApy,
+        borrow: reserve.data.borrowApr,
+      } as AssetRate;
+    });
 
   return {
-    protocol: 'jet',
+    protocol: "jet",
     rates,
   };
 }
 
 function isSupportedAsset(asset: string): boolean {
   switch (asset) {
-    case 'Crypto.BTC/USD': return true;
-    case 'Crypto.ETH/USD': return true;
-    case 'Crypto.SOL/USD': return true;
-    case 'Crypto.USDC/USD': return true;
-    default: return false;
+    case "Crypto.BTC/USD":
+      return true;
+    case "Crypto.ETH/USD":
+      return true;
+    case "Crypto.SOL/USD":
+      return true;
+    case "Crypto.USDC/USD":
+      return true;
+    default:
+      return false;
   }
 }
 
 function toAsset(asset: string): string {
   switch (asset) {
-    case 'Crypto.BTC/USD': return 'BTC';
-    case 'Crypto.ETH/USD': return 'ETH';
-    case 'Crypto.SOL/USD': return 'SOL';
-    case 'Crypto.USDC/USD': return 'USDC';
-    default: throw new Error(`Unsupported asset: ${asset}`);
+    case "Crypto.BTC/USD":
+      return "BTC";
+    case "Crypto.ETH/USD":
+      return "ETH";
+    case "Crypto.SOL/USD":
+      return "SOL";
+    case "Crypto.USDC/USD":
+      return "USDC";
+    default:
+      throw new Error(`Unsupported asset: ${asset}`);
   }
 }
 
@@ -55,18 +74,17 @@ interface AnchorWallet {
 }
 
 class Wallet implements AnchorWallet {
-
   constructor() {}
 
   async signTransaction(tx: Transaction): Promise<Transaction> {
-    throw new Error('Not implemented.');
+    throw new Error("Not implemented.");
   }
 
   async signAllTransactions(txs: Transaction[]): Promise<Transaction[]> {
-    throw new Error('Not implemented.');
+    throw new Error("Not implemented.");
   }
 
   get publicKey(): PublicKey {
-    throw new Error('Not implemented.');
+    throw new Error("Not implemented.");
   }
 }
