@@ -2,7 +2,7 @@ import { PublicKey } from "@solana/web3.js";
 import TOKENS from "../tokens.json";
 import { AssetRate, ProtocolRates, toRate } from "../types";
 
-export async function fetch(url: string): Promise<ProtocolRates> {
+export async function fetch(_url: string): Promise<ProtocolRates> {
   const url = "https://francium.io/app/lend";
 
   const puppeteer = require("puppeteer");
