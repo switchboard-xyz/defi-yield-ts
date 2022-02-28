@@ -38,16 +38,16 @@ export class RateObserver {
     }
   }
 
-  async fetchAll(): Promise<ProtocolRates[]> {
+  async fetchAll(url: string): Promise<ProtocolRates[]> {
     return Promise.all([
-      this.fetch("apricot"),
-      this.fetch("francium"),
-      this.fetch("jet"),
-      this.fetch("larix"),
-      this.fetch("mango"),
-      this.fetch("port"),
-      this.fetch("solend"),
-      this.fetch("tulip"),
+      this.fetch("apricot", url),
+      this.fetch("francium", url),
+      this.fetch("jet", url),
+      this.fetch("larix", url),
+      this.fetch("mango", url),
+      this.fetch("port", url),
+      this.fetch("solend", url),
+      this.fetch("tulip", url),
     ]);
   }
 
