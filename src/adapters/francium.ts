@@ -1,15 +1,15 @@
-import { PublicKey } from "@solana/web3.js"
-import TOKENS from '../tokens.json';
-import { AssetRate, ProtocolRates, toRate } from '../types';
+import { PublicKey } from "@solana/web3.js";
+import TOKENS from "../tokens.json";
+import { AssetRate, ProtocolRates, toRate } from "../types";
 
-export async function fetch(): Promise<ProtocolRates> {
+export async function fetch(url: string): Promise<ProtocolRates> {
   const url = "https://francium.io/app/lend";
 
   const puppeteer = require("puppeteer");
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
   await page.goto(url, { timeout: 15000 });
-  await new Promise(resolve => setTimeout(resolve, 5000));
+  await new Promise((resolve) => setTimeout(resolve, 5000));
   const content = await page.content();
   await browser.close();
 
@@ -18,7 +18,9 @@ export async function fetch(): Promise<ProtocolRates> {
   let rates: AssetRate[] = [];
   $(".ant-table-row").map((i, el) => {
     const asset: string = toAsset($(el).find("td div").first().text());
-    const token = TOKENS.find((token) => { return token.symbol === asset; });
+    const token = TOKENS.find((token) => {
+      return token.symbol === asset;
+    });
     if (token) {
       rates.push({
         asset: token.symbol,
@@ -30,14 +32,16 @@ export async function fetch(): Promise<ProtocolRates> {
   });
 
   return {
-    protocol: 'francium',
+    protocol: "francium",
     rates,
   } as ProtocolRates;
 }
 
 function toAsset(asset: string): string {
   switch (asset) {
-    case 'weWETH (whETH)': return "whETH";
-    default: return asset;
+    case "weWETH (whETH)":
+      return "whETH";
+    default:
+      return asset;
   }
 }
