@@ -1,7 +1,7 @@
 import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 import { Provider, utils } from "@project-serum/anchor";
 import { Cluster, createProgram, State } from "@zero_one/client";
-import { AssetRate, ProtocolRates } from "./src/types";
+import { AssetRate, ProtocolRates } from "../src/types";
 
 export async function fetch(url: string): Promise<ProtocolRates> {
   const options = Provider.defaultOptions();
