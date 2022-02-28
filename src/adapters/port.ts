@@ -23,6 +23,7 @@ export async function fetch(url: string): Promise<ProtocolRates> {
           borrow: reserve.getBorrowApy().getUnchecked().toNumber(),
         } as AssetRate;
       }
+      return undefined;
     })
     .filter((token) => {
       return token != undefined;
