@@ -23,8 +23,10 @@ export async function fetch(): Promise<ProtocolRates> {
         return {
           asset: token!.symbol,
           mint: new PublicKey(token!.mint),
-          deposit: reserve.getSupplyApy().getUnchecked().toNumber(),
-          borrow: reserve.getBorrowApy().getUnchecked().toNumber()
+          borrowAmount: reserve.getBorrowedAsset().getRaw().toNumber(),
+          borrowRate: reserve.getBorrowApy().getUnchecked().toNumber(),
+          depositAmount: reserve.getTotalAsset().getRaw().toNumber(),
+          depositRate: reserve.getSupplyApy().getUnchecked().toNumber(),
         } as AssetRate;
       }
   }).filter((token) => { return token != undefined; }).map((token) => { return token as AssetRate; });

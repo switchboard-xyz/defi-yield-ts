@@ -16,8 +16,10 @@ export async function fetch(): Promise<ProtocolRates> {
     return {
       asset: toAsset(reserve.config.name),
       mint: new PublicKey(reserve.config.mintAddress),
-      deposit: reserve.stats!.supplyInterestAPY,
-      borrow: reserve.stats!.borrowInterestAPY,
+      borrowAmount: reserve.stats!.totalBorrowsWads.div(new BN(WAD)).div(new BN(10 ** reserve.config.decimals)).toNumber(),
+      borrowRate: reserve.stats!.borrowInterestAPY,
+      depositAmount: reserve.stats!.totalDepositsWads.div(new BN(WAD)).div(new BN(10 ** reserve.config.decimals)).toNumber(),
+      depositRate: reserve.stats!.supplyInterestAPY,
     } as AssetRate;
   });
 

@@ -36,8 +36,10 @@ export async function fetch(): Promise<ProtocolRates> {
     return {
       asset: token!.symbol,
       mint: new PublicKey(token!.mint),
-      deposit: assetPool?.depositRate,
-      borrow: assetPool?.borrowRate,
+      borrowAmount: assetPool?.borrowAmount.toNumber(),
+      borrowRate: assetPool?.borrowRate,
+      depositAmount: assetPool?.depositAmount.toNumber(),
+      depositRate: assetPool?.depositRate,
     } as AssetRate;
   });
 

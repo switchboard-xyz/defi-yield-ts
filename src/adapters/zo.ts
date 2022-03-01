@@ -23,18 +23,21 @@ export async function fetch(): Promise<ProtocolRates> {
   const state: State = await State.load(program, globalState.state);
 
   const rateObserver = new RateObserver();
+
   const rates: AssetRate[] = Object.values(state.assets).map(a => {
     return {
       asset: a.symbol,
       mint: new PublicKey(a.mint),
-      deposit: a.supplyApy,
-      borrow: a.borrowsApy
+      borrowAmount: a.borrows.toNumber(),
+      borrowRate: a.borrowsApy,
+      depositAmount: a.supply.toNumber(),
+      depositRate: a.supplyApy,
     } as AssetRate
   }).filter((rate) => { return rateObserver.isSupportedToken(rate.asset, rate.mint); });
 
   return {
     protocol: "01",
-    rates
+    rates,
   }
 }
 

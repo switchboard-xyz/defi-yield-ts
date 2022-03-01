@@ -20,10 +20,10 @@ export type ProtocolRates = {
 export type AssetRate = {
   asset: string;
   mint: PublicKey;
-  deposit: number | undefined;
-  borrow: number | undefined;
-  //TODO totalDeposit: number | undefined;
-  //TODO totalBorrow: number | undefined;
+  borrowAmount: number;
+  borrowRate: number | undefined;
+  depositAmount: number;
+  depositRate: number | undefined;
 };
 
 export function toRate(rate: string): number {

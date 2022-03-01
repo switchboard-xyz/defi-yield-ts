@@ -14,11 +14,15 @@ export async function fetch(): Promise<ProtocolRates> {
   const reserves = await JetReserve.loadMultiple(client, market);
 
   const rates: AssetRate[] = reserves.filter((reserve) => { return isSupportedAsset(reserve.data.productData.product.symbol); }).map((reserve) => {
+    const asset = toAsset(reserve.data.productData.product.symbol);
+    reserve.data.depositApy
     return {
-      asset: toAsset(reserve.data.productData.product.symbol),
+      asset,
       mint: reserve.data.tokenMint,
-      deposit: reserve.data.depositApy,
-      borrow: reserve.data.borrowApr,
+      borrowAmount: reserve.data.state.outstandingDebt.tokens,
+      borrowRate: reserve.data.borrowApr,
+      depositAmount: reserve.data.marketSize.tokens,
+      depositRate: reserve.data.depositApy,
     } as AssetRate;
   });
 
