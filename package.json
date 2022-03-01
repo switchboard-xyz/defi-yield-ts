@@ -19,7 +19,7 @@
     "test": "mocha -r ts-node/register test/**/*.test.ts --timeout 0"
   },
   "dependencies": {
-    "@apricot-lend/sdk-ts": "^0.15.28",
+    "@apricot-lend/sdk-ts": "^0.16.22",
     "@blockworks-foundation/mango-client": "^3.3.13",
     "@jet-lab/jet-engine": "^0.2.15",
     "@port.finance/port-sdk": "^0.2.56",

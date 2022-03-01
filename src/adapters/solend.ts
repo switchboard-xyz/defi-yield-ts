@@ -2,9 +2,7 @@ import { Cluster, clusterApiUrl, Connection, PublicKey } from "@solana/web3.js";
 import { SolendMarket } from "@solendprotocol/solend-sdk";
 import { AssetRate, ProtocolRates } from "../types";
 
-export async function fetch(url: string): Promise<ProtocolRates> {
-  const cluster: Cluster = "mainnet-beta";
-  const connection = new Connection(url);
+export async function fetch(connection: Connection): Promise<ProtocolRates> {
   const market = await SolendMarket.initialize(connection);
   await market.loadReserves();
 

@@ -12,8 +12,8 @@ import { AssetRate, ProtocolRates } from "../types";
 
 BigNumber.config({ EXPONENTIAL_AT: 1e9 });
 
-export async function fetch(url: string): Promise<ProtocolRates> {
-  const reserves = await getLendingReserve(url);
+export async function fetch(connection: Connection): Promise<ProtocolRates> {
+  const reserves = await getLendingReserve(connection);
   const rates: AssetRate[] = reserves
     .filter((reserve) => {
       return !reserve.info.isLP;
@@ -44,8 +44,7 @@ function toAsset(asset: string): string {
   }
 }
 
-export async function getLendingReserve(url: string) {
-  const connection = new Connection(url, "processed");
+export async function getLendingReserve(connection: Connection) {
   const reserveArrayInner = new Array<Detail<Reserve>>();
   // @ts-ignore
   const result = await Promise.all([

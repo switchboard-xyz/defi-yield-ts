@@ -2,7 +2,7 @@ import { Config, IDS, MangoClient } from "@blockworks-foundation/mango-client";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { AssetRate, ProtocolRates } from "../types";
 
-export async function fetch(url: string): Promise<ProtocolRates> {
+export async function fetch(connection: Connection): Promise<ProtocolRates> {
   const cluster = "mainnet";
   const group = "mainnet.1";
   const config = new Config(IDS);
@@ -14,8 +14,6 @@ export async function fetch(url: string): Promise<ProtocolRates> {
     return g.name == group && g.cluster == cluster;
   });
   const mangoProgramIdPk = new PublicKey(clusterData!.mangoProgramId);
-  const clusterUrl = IDS.cluster_urls[cluster];
-  const connection = new Connection(clusterUrl, "singleGossip");
   const client = new MangoClient(connection, mangoProgramIdPk);
   const mangoGroup = await client.getMangoGroup(groupConfig.publicKey);
   await mangoGroup.loadRootBanks(connection);

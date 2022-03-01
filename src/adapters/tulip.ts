@@ -1,9 +1,9 @@
 import { token } from "@project-serum/anchor/dist/cjs/utils";
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, Connection } from "@solana/web3.js";
 import TOKENS from "../tokens.json";
 import { AssetRate, ProtocolRates, toRate } from "../types";
 
-export async function fetch(_url: string): Promise<ProtocolRates> {
+export async function fetch(connection: Connection): Promise<ProtocolRates> {
   const url = "https://tulip.garden/lend";
 
   const puppeteer = require("puppeteer");

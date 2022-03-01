@@ -3,9 +3,8 @@ import { Provider, utils } from "@project-serum/anchor";
 import { Cluster, createProgram, State } from "@zero_one/client";
 import { AssetRate, ProtocolRates } from "../../src/types";
 
-export async function fetch(url: string): Promise<ProtocolRates> {
+export async function fetch(connection: Connection): Promise<ProtocolRates> {
   const options = Provider.defaultOptions();
-  const connection = new Connection(url, options);
   const wallet = new Wallet();
   const provider = new Provider(connection, wallet, options);
   const program = createProgram(provider, Cluster.Mainnet);

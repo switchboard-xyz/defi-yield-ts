@@ -4,8 +4,7 @@ import TOKENS from "../tokens.json";
 import { AssetRate, ProtocolRates } from "../types";
 import { token } from "@project-serum/anchor/dist/cjs/utils";
 
-export async function fetch(url: string): Promise<ProtocolRates> {
-  const connection = new Connection(url);
+export async function fetch(connection: Connection): Promise<ProtocolRates> {
   const port = Port.forMainNet({ connection });
   const context = await port.getReserveContext();
   const reserves: ReserveInfo[] = context.getAllReserves();

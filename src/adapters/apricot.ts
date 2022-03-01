@@ -3,8 +3,7 @@ import { createAssetPoolLoader, TokenID } from "@apricot-lend/sdk-ts";
 import TOKENS from "../tokens.json";
 import { AssetRate, ProtocolRates } from "../types";
 
-export async function fetch(url: string): Promise<ProtocolRates> {
-  const connection = new Connection(url, "processed");
+export async function fetch(connection: Connection): Promise<ProtocolRates> {
   const assetPoolLoader = await createAssetPoolLoader(connection);
 
   const rates: AssetRate[] = (

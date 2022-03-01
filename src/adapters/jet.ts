@@ -8,9 +8,8 @@ import { Provider } from "@project-serum/anchor";
 import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 import { AssetRate, ProtocolRates } from "../types";
 
-export async function fetch(url: string): Promise<ProtocolRates> {
+export async function fetch(connection: Connection): Promise<ProtocolRates> {
   const options = Provider.defaultOptions();
-  const connection = new Connection(url, options);
   const wallet = new Wallet();
   const provider = new Provider(connection, wallet, options);
   const client = await JetClient.connect(provider, true);
