@@ -1,5 +1,5 @@
 import { token } from "@project-serum/anchor/dist/cjs/utils";
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, Connection } from "@solana/web3.js";
 import * as apricot from "./adapters/apricot";
 import * as francium from "./adapters/francium";
 import * as jet from "./adapters/jet";
@@ -13,41 +13,44 @@ import TOKENS from "./tokens.json";
 import { Protocol, ProtocolRates } from "./types";
 
 export class RateObserver {
-  async fetch(protocol: Protocol, url: string): Promise<ProtocolRates> {
+  async fetch(
+    protocol: Protocol,
+    connection: Connection
+  ): Promise<ProtocolRates> {
     switch (protocol) {
       case "apricot":
-        return apricot.fetch(url);
+        return apricot.fetch(connection);
       case "francium":
-        return francium.fetch(url);
+        return francium.fetch(connection);
       case "jet":
-        return jet.fetch(url);
+        return jet.fetch(connection);
       case "larix":
-        return larix.fetch(url);
+        return larix.fetch(connection);
       case "mango":
-        return mango.fetch(url);
+        return mango.fetch(connection);
       case "port":
-        return port.fetch(url);
+        return port.fetch(connection);
       case "solend":
-        return solend.fetch(url);
+        return solend.fetch(connection);
       case "tulip":
-        return tulip.fetch(url);
+        return tulip.fetch(connection);
       case "01":
-        return zo.fetch(url);
+        return zo.fetch(connection);
       default:
         throw new Error(`Invalid protocol: ${protocol}`);
     }
   }
 
-  async fetchAll(url: string): Promise<ProtocolRates[]> {
+  async fetchAll(connection: Connection): Promise<ProtocolRates[]> {
     return Promise.all([
-      this.fetch("apricot", url),
-      this.fetch("francium", url),
-      this.fetch("jet", url),
-      this.fetch("larix", url),
-      this.fetch("mango", url),
-      this.fetch("port", url),
-      this.fetch("solend", url),
-      this.fetch("tulip", url),
+      this.fetch("apricot", connection),
+      this.fetch("francium", connection),
+      this.fetch("jet", connection),
+      this.fetch("larix", connection),
+      this.fetch("mango", connection),
+      this.fetch("port", connection),
+      this.fetch("solend", connection),
+      this.fetch("tulip", connection),
     ]);
   }
 
