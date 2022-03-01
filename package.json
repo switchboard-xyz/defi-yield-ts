@@ -34,7 +34,7 @@
     "bignumber": "^1.1.0",
     "bignumber.js": "^9.0.2",
     "cheerio": "^1.0.0-rc.10",
-    "puppeteer": "^13.2.0",
+    "puppeteer": "^13.4.1",
     "user-agents": "^1.0.922"
   },
   "devDependencies": {

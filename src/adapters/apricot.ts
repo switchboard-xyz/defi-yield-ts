@@ -28,8 +28,8 @@ export async function fetch(connection: Connection): Promise<ProtocolRates> {
     return {
       asset: token!.symbol,
       mint: new PublicKey(token!.mint),
-      deposit: assetPool?.depositRate,
-      borrow: assetPool?.borrowRate,
+      deposit: assetPool?.depositRate.toNumber(),
+      borrow: assetPool?.borrowRate.toNumber(),
     } as AssetRate;
   });
 
