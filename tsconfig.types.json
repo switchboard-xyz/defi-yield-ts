@@ -9,6 +9,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "target": "es2019",
+    "module": "commonjs",
     "typeRoots": ["types/", "node_modules/@types"],
     "outDir": "lib/",
     "declarationMap": true,

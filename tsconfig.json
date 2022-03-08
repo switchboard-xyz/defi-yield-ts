@@ -8,6 +8,7 @@
     "typeRoots": ["types/", "node_modules/@types"],
     "outDir": "lib/",
     "target": "es2019",
+    "module": "commonjs",
     "lib": ["dom", "dom.iterable", "es2019"],
     "allowJs": true,
     "checkJs": false,
