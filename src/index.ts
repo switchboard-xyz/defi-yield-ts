@@ -1,2 +1,2 @@
-export * from "./rateObserver"
-export * from "./types"
+export * from "./rateObserver";
+export * from "./types";
