@@ -1,11 +1,11 @@
 {
   "name": "@switchboard-xyz/defi-yield-ts",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "license": "AGPL-3.0-or-later",
   "scripts": {
-    "build": "rm -rf lib/ && babel src --out-dir lib --extensions \".ts\" && tsc --project tsconfig.types.json",
+    "build": "rm -rf lib/ && babel src --out-dir lib --extensions \".ts\" --copy-files && tsc --project tsconfig.types.json",
     "test-all": "mocha -r ts-node/register test/all.test.ts --timeout 0",
     "test-apricot": "mocha -r ts-node/register test/apricot.test.ts --timeout 0",
     "test-francium": "mocha -r ts-node/register test/francium.test.ts --timeout 0",
@@ -34,6 +34,7 @@
     "bignumber": "^1.1.0",
     "bignumber.js": "^9.0.2",
     "cheerio": "^1.0.0-rc.10",
+    "core-js": "^3.21.1",
     "puppeteer": "^13.4.1",
     "user-agents": "^1.0.922"
   },
