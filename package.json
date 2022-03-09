@@ -1,6 +1,6 @@
 {
   "name": "@jet-lab/defi-yield-ts",
-  "version": "1.0.4",
+  "version": "1.0.7",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "AGPL-3.0-or-later",

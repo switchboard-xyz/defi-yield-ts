@@ -11,7 +11,7 @@ import TOKENS from '../tokens.json';
 import { AssetRate, ProtocolRates } from '../types';
 
 export async function fetch(): Promise<ProtocolRates> {
-  const connection = new Connection('https://port-finance.rpcpool.com');
+  const connection = new Connection('https://jetprotocol.genesysgo.net/');
   const port = Port.forMainNet({ connection });
   const context = await port.getReserveContext();
   const reserves: ReserveInfo[] = context.getAllReserves()
