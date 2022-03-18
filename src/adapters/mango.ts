@@ -11,8 +11,7 @@ export async function fetch(): Promise<ProtocolRates> {
   if (!groupConfig) { throw new Error("unable to get mango group config"); }
   const clusterData = IDS.groups.find((g) => { return g.name == group && g.cluster == cluster; });
   const mangoProgramIdPk = new PublicKey(clusterData!.mangoProgramId);
-  const clusterUrl = IDS.cluster_urls[cluster];
-  const connection = new Connection(clusterUrl, 'singleGossip');
+  const connection = new Connection("https://jetprotocol.genesysgo.net/", 'singleGossip');
   const client = new MangoClient(connection, mangoProgramIdPk);
   const mangoGroup = await client.getMangoGroup(groupConfig.publicKey);
   await mangoGroup.loadRootBanks(connection);

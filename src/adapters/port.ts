@@ -2388,7 +2388,7 @@ export class Port {
   }
 
   public static forMainNet({
-    connection = new Connection("https://port-finance.rpcpool.com"),
+    connection = new Connection("https://jetprotocol.genesysgo.net/"),
     profile = Environment.forMainNet(),
     lendingMarket = DEFAULT_PORT_LENDING_MARKET,
   }: {

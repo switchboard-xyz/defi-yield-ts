@@ -15,7 +15,7 @@ import TOKENS from '../tokens.json';
 import { AssetRate, ProtocolRates } from '../types';
 
 export async function fetch(): Promise<ProtocolRates> {
-  const connection = new Connection("https://apricot.genesysgo.net/", "processed");
+  const connection = new Connection("https://jetprotocol.genesysgo.net/", "processed");
   const assetPoolLoader = await createAssetPoolLoader(connection);
 
   const rates: AssetRate[] = (await Promise.all([

@@ -7,8 +7,7 @@ import { AccountInfo, Cluster, clusterApiUrl, Connection, PublicKey } from '@sol
 import { AssetRate, ProtocolRates } from '../types';
 
 export async function fetch(): Promise<ProtocolRates> {
-  const cluster: Cluster = 'mainnet-beta';
-  const connection = new Connection(clusterApiUrl(cluster));
+  const connection = new Connection("https://jetprotocol.genesysgo.net/");
   const market = await SolendMarket.initialize(connection);
   await market.loadReserves();
 
