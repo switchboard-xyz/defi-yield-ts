@@ -1,11 +1,13 @@
-import {Connection, PublicKey, Transaction} from "@solana/web3.js";
-import {Provider, utils} from "@project-serum/anchor";
-import {Cluster, createProgram, State} from "@zero_one/client";
-import {AssetRate, ProtocolRates} from "src/types";
+import { Provider, utils } from "@project-serum/anchor";
+import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 
-export async function fetch(): Promise<ProtocolRates> {
+import { RateObserver } from '../rateObserver'
+import { AssetRate, ProtocolRates } from '../types';
+import { Cluster, createProgram, State } from "../zo";
+
+export async function fetch(url: string): Promise<ProtocolRates> {
   const options = Provider.defaultOptions();
-  const connection = new Connection("https://api.mainnet-beta.solana.com", options);
+  const connection = new Connection(url, options);
   const wallet = new Wallet();
   const provider = new Provider(connection, wallet, options);
   const program = createProgram(provider, Cluster.Mainnet);
@@ -20,20 +22,26 @@ export async function fetch(): Promise<ProtocolRates> {
   );
   const state: State = await State.load(program, globalState.state);
 
+  const rateObserver = new RateObserver();
+
   const rates: AssetRate[] = Object.values(state.assets).map(a => {
     return {
       asset: a.symbol,
       mint: new PublicKey(a.mint),
-      deposit: a.supplyApy,
-      borrow: a.borrowsApy
+      borrowAmount: a.borrows.toNumber(),
+      borrowRate: a.borrowsApy,
+      depositAmount: a.supply.toNumber(),
+      depositRate: a.supplyApy,
     } as AssetRate
-  })
+  }).filter((rate) => { return rateObserver.isSupportedToken(rate.asset, rate.mint); });
 
   return {
     protocol: "01",
-    rates
+    rates,
   }
 }
+
+
 
 interface AnchorWallet {
   signTransaction(tx: Transaction): Promise<Transaction>;

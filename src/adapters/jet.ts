@@ -3,9 +3,9 @@ import { Provider } from "@project-serum/anchor"
 import { Connection, PublicKey, Transaction } from "@solana/web3.js"
 import { AssetRate, ProtocolRates } from '../types';
 
-export async function fetch(): Promise<ProtocolRates> {
+export async function fetch(url: string): Promise<ProtocolRates> {
   const options = Provider.defaultOptions();
-  const connection = new Connection("https://api.mainnet-beta.solana.com", options);
+  const connection = new Connection(url, options);
   const wallet = new Wallet();
   const provider = new Provider(connection, wallet, options);
   const client = await JetClient.connect(provider, true);
@@ -14,11 +14,15 @@ export async function fetch(): Promise<ProtocolRates> {
   const reserves = await JetReserve.loadMultiple(client, market);
 
   const rates: AssetRate[] = reserves.filter((reserve) => { return isSupportedAsset(reserve.data.productData.product.symbol); }).map((reserve) => {
+    const asset = toAsset(reserve.data.productData.product.symbol);
+    reserve.data.depositApy
     return {
-      asset: toAsset(reserve.data.productData.product.symbol),
+      asset,
       mint: reserve.data.tokenMint,
-      deposit: reserve.data.depositApy,
-      borrow: reserve.data.borrowApr,
+      borrowAmount: reserve.data.state.outstandingDebt.tokens,
+      borrowRate: reserve.data.borrowApr,
+      depositAmount: reserve.data.marketSize.tokens,
+      depositRate: reserve.data.depositApy,
     } as AssetRate;
   });
 
