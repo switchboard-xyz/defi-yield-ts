@@ -5,9 +5,9 @@ import { RateObserver } from '../rateObserver'
 import { AssetRate, ProtocolRates } from '../types';
 import { Cluster, createProgram, State } from "../zo";
 
-export async function fetch(): Promise<ProtocolRates> {
+export async function fetch(url: string): Promise<ProtocolRates> {
   const options = Provider.defaultOptions();
-  const connection = new Connection("https://jetprotocol.genesysgo.net/", options);
+  const connection = new Connection(url, options);
   const wallet = new Wallet();
   const provider = new Provider(connection, wallet, options);
   const program = createProgram(provider, Cluster.Mainnet);

@@ -14,8 +14,8 @@ import * as rax from 'retry-axios';
 import TOKENS from '../tokens.json';
 import { AssetRate, ProtocolRates } from '../types';
 
-export async function fetch(): Promise<ProtocolRates> {
-  const connection = new Connection("https://jetprotocol.genesysgo.net/", "processed");
+export async function fetch(url: string): Promise<ProtocolRates> {
+  const connection = new Connection(url, "processed");
   const assetPoolLoader = await createAssetPoolLoader(connection);
 
   const rates: AssetRate[] = (await Promise.all([

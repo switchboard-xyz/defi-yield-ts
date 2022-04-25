@@ -3,7 +3,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 
 import { AssetRate, ProtocolRates } from '../types';
 
-export async function fetch(): Promise<ProtocolRates> {
+export async function fetch(url: string): Promise<ProtocolRates> {
   const cluster = 'mainnet';
   const group = 'mainnet.1';
   const config = new Config(IDS);
@@ -11,7 +11,7 @@ export async function fetch(): Promise<ProtocolRates> {
   if (!groupConfig) { throw new Error("unable to get mango group config"); }
   const clusterData = IDS.groups.find((g) => { return g.name == group && g.cluster == cluster; });
   const mangoProgramIdPk = new PublicKey(clusterData!.mangoProgramId);
-  const connection = new Connection("https://jetprotocol.genesysgo.net/", 'singleGossip');
+  const connection = new Connection(url, 'singleGossip');
   const client = new MangoClient(connection, mangoProgramIdPk);
   const mangoGroup = await client.getMangoGroup(groupConfig.publicKey);
   await mangoGroup.loadRootBanks(connection);
