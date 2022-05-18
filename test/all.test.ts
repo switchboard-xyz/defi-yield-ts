@@ -5,7 +5,7 @@ describe('All', () => {
 
   it('Fetch All Rates.', async () => {
     const rateObserver = new RateObserver();
-    const url = "https://jetprot-main-0d7b.mainnet.rpcpool.com/";
+    const url = "https://solana-api.projectserum.com/";
     const protocolRates: ProtocolRates[] = await rateObserver.fetchAll(url);
   });
 

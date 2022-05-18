@@ -6,7 +6,7 @@ describe('Apricot', () => {
 
   it('Fetch Apricot Rates.', async () => {
     const rateObserver = new RateObserver();
-    const url = "https://jetprot-main-0d7b.mainnet.rpcpool.com/";
+    const url = "https://solana-api.projectserum.com/";
     const protocolRates: ProtocolRates = await rateObserver.fetch('apricot', url);
     assert(protocolRates.protocol === 'apricot');
     assert(protocolRates.rates.length > 0);

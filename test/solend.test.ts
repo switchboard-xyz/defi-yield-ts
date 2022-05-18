@@ -6,7 +6,7 @@ describe('Solend', () => {
 
   it('Fetch Solend Rates.', async () => {
     const rateObserver = new RateObserver();
-    const url = "https://jetprot-main-0d7b.mainnet.rpcpool.com/";
+    const url = "https://solana-api.projectserum.com/";
     const protocolRates: ProtocolRates = await rateObserver.fetch('solend', url);
     assert(protocolRates.protocol === 'solend');
     assert(protocolRates.rates.length > 0);
