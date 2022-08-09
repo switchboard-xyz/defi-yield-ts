@@ -1,5 +1,6 @@
 import { Config, IDS, MangoClient } from "@blockworks-foundation/mango-client";
 import { Connection, PublicKey } from "@solana/web3.js";
+
 import { AssetRate, ProtocolRates } from "../types";
 
 export async function fetch(connection: Connection): Promise<ProtocolRates> {
@@ -20,13 +21,17 @@ export async function fetch(connection: Connection): Promise<ProtocolRates> {
 
   const rates: AssetRate[] = groupConfig.tokens.map((e) => {
     const tokenIndex = mangoGroup.getTokenIndex(e.mintKey);
+    const borrowAmount = mangoGroup.getUiTotalBorrow(tokenIndex);
     const borrowRate = mangoGroup.getBorrowRate(tokenIndex);
+    const depositAmount = mangoGroup.getUiTotalDeposit(tokenIndex);
     const depositRate = mangoGroup.getDepositRate(tokenIndex);
     return {
       asset: toAsset(e.symbol),
       mint: new PublicKey(e.mintKey),
-      deposit: depositRate.toNumber(),
-      borrow: borrowRate.toNumber(),
+      borrowAmount: borrowAmount.toNumber(),
+      borrowRate: borrowRate.toNumber(),
+      depositAmount: depositAmount.toNumber(),
+      depositRate: depositRate.toNumber(),
     } as AssetRate;
   });
 

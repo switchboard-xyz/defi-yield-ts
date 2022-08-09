@@ -12,7 +12,7 @@ export async function fetch(connection: Connection): Promise<ProtocolRates> {
   const options = Provider.defaultOptions();
   const wallet = new Wallet();
   const provider = new Provider(connection, wallet, options);
-  const client = await JetClient.connect(provider, true);
+  const client = await JetClient.connect(provider as any, true);
   const markets = await JetMarket.allMarkets(client);
   const market = await JetMarket.load(client, JET_MARKET_ADDRESS);
   const reserves = await JetReserve.loadMultiple(client, market);
@@ -22,11 +22,15 @@ export async function fetch(connection: Connection): Promise<ProtocolRates> {
       return isSupportedAsset(reserve.data.productData.product.symbol);
     })
     .map((reserve) => {
+      const asset = toAsset(reserve.data.productData.product.symbol);
+      reserve.data.depositApy;
       return {
-        asset: toAsset(reserve.data.productData.product.symbol),
+        asset,
         mint: reserve.data.tokenMint,
-        deposit: reserve.data.depositApy,
-        borrow: reserve.data.borrowApr,
+        borrowAmount: reserve.data.state.outstandingDebt.tokens,
+        borrowRate: reserve.data.borrowApr,
+        depositAmount: reserve.data.marketSize.tokens,
+        depositRate: reserve.data.depositApy,
       } as AssetRate;
     });
 

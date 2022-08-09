@@ -2,7 +2,6 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import { Port, ReserveInfo } from "@port.finance/port-sdk";
 import TOKENS from "../tokens.json";
 import { AssetRate, ProtocolRates } from "../types";
-import { token } from "@project-serum/anchor/dist/cjs/utils";
 
 export async function fetch(connection: Connection): Promise<ProtocolRates> {
   const port = Port.forMainNet({ connection });
@@ -18,11 +17,12 @@ export async function fetch(connection: Connection): Promise<ProtocolRates> {
         return {
           asset: token!.symbol,
           mint: new PublicKey(token!.mint),
-          deposit: reserve.getSupplyApy().getUnchecked().toNumber(),
-          borrow: reserve.getBorrowApy().getUnchecked().toNumber(),
+          borrowAmount: reserve.getBorrowedAsset().getRaw().toNumber(),
+          borrowRate: reserve.getBorrowApy().getUnchecked().toNumber(),
+          depositAmount: reserve.getTotalAsset().getRaw().toNumber(),
+          depositRate: reserve.getSupplyApy().getUnchecked().toNumber(),
         } as AssetRate;
       }
-      return undefined;
     })
     .filter((token) => {
       return token != undefined;

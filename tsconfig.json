@@ -1,17 +1,12 @@
 {
   "compilerOptions": {
-    // Ensure that .d.ts files are created by tsc, but not .js files
-    "declaration": true,
-    "emitDeclarationOnly": true,
-    // Ensure that Babel can safely transpile files in the TypeScript project
-    "isolatedModules": true,
-    "typeRoots": ["types/", "node_modules/@types"],
-    "outDir": "lib/",
+    "typeRoots": [ "types/", "node_modules/@types" ],
+    "outDir": "dist/",
     "target": "es2019",
-    "module": "commonjs",
     "lib": ["dom", "dom.iterable", "es2019"],
     "allowJs": true,
-    "checkJs": false,
+    "checkJs": true,
+    "declaration": true,
     "declarationMap": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
@@ -24,10 +19,12 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@solana/web3.js": ["./node_modules/@solana/web3.js/lib"]
+      "@solana/web3.js": [
+        "./node_modules/@solana/web3.js/lib"
+      ]
     },
     "moduleResolution": "node",
-    "rootDir": "./src"
+    "rootDir": "./src",
   },
   "include": ["./src/**/*"],
   "exclude": ["./src/**/*.test.js", "node_modules", "**/node_modules"]

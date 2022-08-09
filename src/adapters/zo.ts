@@ -1,7 +1,9 @@
-import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 import { Provider, utils } from "@project-serum/anchor";
-import { Cluster, createProgram, State } from "@zero_one/client";
-import { AssetRate, ProtocolRates } from "../../src/types";
+import { Connection, PublicKey, Transaction } from "@solana/web3.js";
+
+import { RateObserver } from "../rateObserver";
+import { AssetRate, ProtocolRates } from "../types";
+import { Cluster, createProgram, State } from "../zo";
 
 export async function fetch(connection: Connection): Promise<ProtocolRates> {
   const options = Provider.defaultOptions();
@@ -17,14 +19,22 @@ export async function fetch(connection: Connection): Promise<ProtocolRates> {
   const globalState = await program.account.globalState!.fetch(globalStateKey);
   const state: State = await State.load(program, globalState.state);
 
-  const rates: AssetRate[] = Object.values(state.assets).map((a) => {
-    return {
-      asset: a.symbol,
-      mint: new PublicKey(a.mint),
-      deposit: a.supplyApy,
-      borrow: a.borrowsApy,
-    } as AssetRate;
-  });
+  const rateObserver = new RateObserver();
+
+  const rates: AssetRate[] = Object.values(state.assets)
+    .map((a) => {
+      return {
+        asset: a.symbol,
+        mint: new PublicKey(a.mint),
+        borrowAmount: a.borrows.toNumber(),
+        borrowRate: a.borrowsApy,
+        depositAmount: a.supply.toNumber(),
+        depositRate: a.supplyApy,
+      } as AssetRate;
+    })
+    .filter((rate) => {
+      return rateObserver.isSupportedToken(rate.asset, rate.mint);
+    });
 
   return {
     protocol: "01",
