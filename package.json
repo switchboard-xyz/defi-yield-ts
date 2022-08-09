@@ -7,6 +7,7 @@
   "license": "AGPL-3.0-or-later",
   "files": [
     "dist",
+    "src",
     "package.json",
     "yarn.lock"
   ],
@@ -28,11 +29,11 @@
     "test-solend": "mocha -r ts-node/register test/solend.test.ts --timeout 0",
     "test-tulip": "mocha -r ts-node/register test/tulip.test.ts --timeout 0",
     "test-01": "mocha -r ts-node/register test/zo.test.ts --timeout 0",
-    "test": "mocha -r ts-node/register test/**/*.test.ts --timeout 0"
+    "test": "ts-mocha -r ts-node/register test/**/*.test.ts --timeout 0"
   },
   "dependencies": {
     "@blockworks-foundation/mango-client": "^3.6.11",
-    "@jet-lab/jet-engine": "^0.3.8",
+    "@jet-lab/jet-engine": "^0.2.21",
     "@port.finance/port-sdk": "^0.2.63",
     "@project-serum/anchor": "^0.21.0",
     "@pythnetwork/client": "^2.7.3",
