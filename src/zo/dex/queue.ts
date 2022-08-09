@@ -5,7 +5,7 @@ import {
   u128,
   u64,
   zeros,
-} from "./layout";
+} from "./layout.js";
 import BN from "bn.js";
 import { PublicKey } from "@solana/web3.js";
 
@@ -88,7 +88,7 @@ export interface Event {
 function decodeQueueItem(headerLayout, nodeLayout, buffer: Buffer, nodeIndex) {
   return nodeLayout.decode(
     buffer,
-    headerLayout.span + nodeIndex * nodeLayout.span,
+    headerLayout.span + nodeIndex * nodeLayout.span
   );
 }
 
@@ -96,11 +96,11 @@ function decodeQueue(
   headerLayout,
   nodeLayout,
   buffer: Buffer,
-  history?: number,
+  history?: number
 ) {
   const header = headerLayout.decode(buffer);
   const allocLen = Math.floor(
-    (buffer.length - headerLayout.span) / nodeLayout.span,
+    (buffer.length - headerLayout.span) / nodeLayout.span
   );
   const nodes: any[] = [];
   if (history) {
@@ -121,7 +121,7 @@ function decodeQueue(
 export function decodeEventsSince(buffer: Buffer, lastSeqNum: number): Event[] {
   const header = EVENT_QUEUE_HEADER.decode(buffer);
   const allocLen = Math.floor(
-    (buffer.length - EVENT_QUEUE_HEADER.span) / EVENT.span,
+    (buffer.length - EVENT_QUEUE_HEADER.span) / EVENT.span
   );
 
   // calculate number of missed events
@@ -152,7 +152,7 @@ export function decodeRequestQueue(buffer: Buffer, history?: number) {
     REQUEST_QUEUE_HEADER,
     REQUEST,
     buffer,
-    history,
+    history
   );
   if (!header.accountFlags.initialized || !header.accountFlags.requestQueue) {
     throw new Error("Invalid requests queue");
@@ -165,7 +165,7 @@ export function decodeEventQueue(buffer: Buffer, history?: number): Event[] {
     EVENT_QUEUE_HEADER,
     EVENT,
     buffer,
-    history,
+    history
   );
   if (!header.accountFlags.initialized || !header.accountFlags.eventQueue) {
     throw new Error("Invalid events queue");

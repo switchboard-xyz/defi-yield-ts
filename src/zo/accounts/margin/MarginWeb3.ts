@@ -12,17 +12,17 @@ import { Program, ProgramAccount } from "@project-serum/anchor";
 import { Market as SerumMarket } from "@zero_one/lite-serum";
 import BN from "bn.js";
 import { Buffer } from "buffer";
-import BaseAccount from "../BaseAccount";
-import State from "../State";
-import Control from "../Control";
-import Num from "../../Num";
+import BaseAccount from "../BaseAccount.js";
+import State from "../State.js";
+import Control from "../Control.js";
+import Num from "../../Num.js";
 import {
   Cluster,
   findAssociatedTokenAddress,
   getAssociatedTokenTransactionWithPayer,
   getWrappedSolInstructionsAndKey,
   loadWI80F48,
-} from "../../utils";
+} from "../../utils/index.js";
 import {
   ControlSchema,
   MarginSchema,
@@ -43,10 +43,10 @@ import {
   ZO_FUTURE_TAKER_FEE,
   ZO_OPTION_TAKER_FEE,
   ZO_SQUARE_TAKER_FEE,
-} from "../../config";
+} from "../../config.js";
 import Decimal from "decimal.js";
 import { getMintDecimals } from "@zero_one/lite-serum/lib/market";
-import { OrderInfo, PositionInfo } from "../../types/dataTypes";
+import { OrderInfo, PositionInfo } from "../../types/dataTypes.js";
 
 export interface MarginClassSchema extends Omit<MarginSchema, "collateral"> {
   /** The deposit amount divided by the entry supply or borrow multiplier */
@@ -72,7 +72,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
     data: MarginClassSchema,
     public readonly control: Control,
     public state: State,
-    public readonly owner?: PublicKey,
+    public readonly owner?: PublicKey
   ) {
     super(program, pubkey, data);
   }
@@ -83,7 +83,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
   protected static async loadWeb3(
     program: Program<Zo>,
     st: State,
-    owner?: PublicKey,
+    owner?: PublicKey
   ): Promise<MarginWeb3> {
     const marginOwner = owner || program.provider.wallet.publicKey;
     const [key] = await this.getPda(st, marginOwner, program.programId);
@@ -104,20 +104,20 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
     st: State,
     prefetchedMarginData: ProgramAccount<MarginSchema>,
     prefetchedControlData: ProgramAccount<ControlSchema>,
-    withOrders: boolean,
+    withOrders: boolean
   ): Promise<MarginWeb3> {
     const data = this.transformFetchedData(st, prefetchedMarginData.account);
     const control = await Control.loadPrefetched(
       program,
       prefetchedControlData.publicKey,
-      prefetchedControlData.account,
+      prefetchedControlData.account
     );
     const margin = new this(
       program,
       prefetchedMarginData.publicKey,
       data,
       control,
-      st,
+      st
     );
     margin.loadBalances();
     margin.loadPositions();
@@ -131,7 +131,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
     program: Program<Zo>,
     st: State,
     accountInfo: AccountInfo<Buffer>,
-    withOrders: boolean,
+    withOrders: boolean
   ): Promise<MarginWeb3> {
     const account = program.coder.accounts.decode("margin", accountInfo.data);
     const data = this.transformFetchedData(st, account);
@@ -147,11 +147,11 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
 
   async updateWithAccountInfo(
     accountInfo: AccountInfo<Buffer>,
-    withOrders = true,
+    withOrders = true
   ) {
     const account = this.program.coder.accounts.decode(
       "margin",
-      accountInfo.data,
+      accountInfo.data
     );
     this.data = MarginWeb3.transformFetchedData(this.state, account);
     this.loadBalances();
@@ -163,7 +163,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
 
   async updateControlFromAccountInfo(
     accountInfo: AccountInfo<Buffer>,
-    withOrders = true,
+    withOrders = true
   ) {
     this.control.updateControlFromAccountInfo(accountInfo);
     this.loadBalances();
@@ -182,7 +182,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
   protected static async create(
     program: Program<Zo>,
     st: State,
-    commitment: Commitment = "finalized",
+    commitment: Commitment = "finalized"
   ): Promise<MarginWeb3> {
     const conn = program.provider.connection;
     const [[key, nonce], control, controlLamports] = await Promise.all([
@@ -212,7 +212,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
         ],
         signers: [control],
       }),
-      commitment,
+      commitment
     );
     return await MarginWeb3.loadWeb3(program, st);
   }
@@ -224,25 +224,25 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
   protected static async getPda(
     st: State,
     traderKey: PublicKey,
-    programId: PublicKey,
+    programId: PublicKey
   ): Promise<[PublicKey, number]> {
     return await PublicKey.findProgramAddress(
       [traderKey.toBuffer(), st.pubkey.toBuffer(), Buffer.from("marginv1")],
-      programId,
+      programId
     );
   }
 
   protected static async loadAllMarginAndControlSchemas(program: Program<Zo>) {
     const marginSchemas = (await program.account["margin"].all()).map(
-      (t) => t as ProgramAccount<MarginSchema>,
+      (t) => t as ProgramAccount<MarginSchema>
     );
     const controlSchemas = (await program.account["control"].all()).map(
-      (t) => t as ProgramAccount<ControlSchema>,
+      (t) => t as ProgramAccount<ControlSchema>
     );
     return marginSchemas.map((ms) => ({
       marginSchema: ms,
       controlSchema: controlSchemas.find((cs) =>
-        cs.publicKey.equals(ms.account.control),
+        cs.publicKey.equals(ms.account.control)
       ) as ProgramAccount<ControlSchema>,
     }));
   }
@@ -250,18 +250,18 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
   private static async fetch(
     program: Program<Zo>,
     k: PublicKey,
-    st: State,
+    st: State
   ): Promise<MarginClassSchema> {
     const data = (await program.account["margin"].fetch(
       k,
-      "recent",
+      "recent"
     )) as MarginSchema;
     return MarginWeb3.transformFetchedData(st, data);
   }
 
   private static transformFetchedData(
     st: State,
-    data: MarginSchema,
+    data: MarginSchema
   ): MarginClassSchema {
     const ch = st.cache;
     const rawCollateral = data.collateral
@@ -275,17 +275,17 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
           new BN(
             rawCollateral[i]!.isPos()
               ? rawCollateral[i]!.times(
-                  ch.data.borrowCache[i]!.supplyMultiplier,
+                  ch.data.borrowCache[i]!.supplyMultiplier
                 )
                   .floor()
                   .toString()
               : rawCollateral[i]!.times(
-                  ch.data.borrowCache[i]!.borrowMultiplier,
+                  ch.data.borrowCache[i]!.borrowMultiplier
                 )
                   .floor()
-                  .toString(),
+                  .toString()
           ),
-          c.decimals,
+          c.decimals
         );
       }),
     };
@@ -358,12 +358,12 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
     for (const market of Object.values(markets)) {
       const marketOrders: OrderInfo[] = [];
       const { dexMarket, bids, asks } = await this.state.getZoMarketAccounts(
-        market,
+        market
       );
       const activeOrders = dexMarket.filterForOpenOrders(
         bids,
         asks,
-        this.control.pubkey,
+        this.control.pubkey
       );
       for (const order of activeOrders) {
         marketOrders.push({
@@ -396,7 +396,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
         this.data = await MarginWeb3.fetch(
           this.program,
           this.pubkey,
-          this.state,
+          this.state
         );
       }
     }
@@ -412,14 +412,14 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
    */
   async getOpenOrdersKeyBySymbol(
     symbol: string,
-    cluster: Cluster,
+    cluster: Cluster
   ): Promise<[PublicKey, number]> {
     const dexMarket = this.state.getMarketKeyBySymbol(symbol);
     return await PublicKey.findProgramAddress(
       [this.data.control.toBuffer(), dexMarket.toBuffer()],
       cluster === Cluster.Devnet
         ? ZO_DEX_DEVNET_PROGRAM_ID
-        : ZO_DEX_MAINNET_PROGRAM_ID,
+        : ZO_DEX_MAINNET_PROGRAM_ID
     );
   }
 
@@ -430,7 +430,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
    */
   async getOpenOrdersInfoBySymbol(
     symbol: string,
-    create = false,
+    create = false
   ): Promise<Control["data"]["openOrdersAgg"][0] | null> {
     const marketIndex = this.state.getMarketIndexBySymbol(symbol);
     let oo = this.control.data.openOrdersAgg[marketIndex];
@@ -456,7 +456,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
     tokenAccount: PublicKey,
     vault: PublicKey,
     amount: BN,
-    repayOnly: boolean,
+    repayOnly: boolean
   ) {
     return await this.program.rpc.deposit(repayOnly, amount, {
       accounts: {
@@ -549,7 +549,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
     mint: PublicKey,
     size: number,
     repayOnly: boolean,
-    tokenAccountProvided?: PublicKey,
+    tokenAccountProvided?: PublicKey
   ) {
     const [vault, collateralInfo] = this.state.getVaultCollateralByMint(mint);
     const amountSmoll = new Num(size, collateralInfo.decimals).n;
@@ -560,7 +560,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
       ? tokenAccountProvided
       : await findAssociatedTokenAddress(
           this.program.provider.wallet.publicKey,
-          mint,
+          mint
         );
     return await this.depositRaw(tokenAccount, vault, amountSmoll, repayOnly);
   }
@@ -579,7 +579,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
     vault: PublicKey,
     amount: BN,
     allowBorrow: boolean,
-    preInstructions: TransactionInstruction[] | undefined,
+    preInstructions: TransactionInstruction[] | undefined
   ) {
     return await this.program.rpc.withdraw(allowBorrow, amount, {
       accounts: {
@@ -611,14 +611,14 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
     }
     const associatedTokenAccount = await findAssociatedTokenAddress(
       this.program.provider.wallet.publicKey,
-      mint,
+      mint
     );
     //optimize: can be cached
     let associatedTokenAccountExists = false;
     if (
       await this.program.provider.connection.getAccountInfo(
         associatedTokenAccount,
-        "recent",
+        "recent"
       )
     ) {
       associatedTokenAccountExists = true;
@@ -635,9 +635,9 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
             getAssociatedTokenTransactionWithPayer(
               mint,
               associatedTokenAccount,
-              this.program.provider.wallet.publicKey,
+              this.program.provider.wallet.publicKey
             ),
-          ],
+          ]
     );
   }
 
@@ -650,7 +650,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
       symbol,
       this.program.programId.equals(ZERO_ONE_DEVNET_PROGRAM_ID)
         ? Cluster.Devnet
-        : Cluster.Mainnet,
+        : Cluster.Mainnet
     );
     return await this.program.rpc.createPerpOpenOrders({
       accounts: {
@@ -733,7 +733,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
             : ZO_DEX_MAINNET_PROGRAM_ID,
           rent: SYSVAR_RENT_PUBKEY,
         },
-      },
+      }
     );
   }
 
@@ -779,8 +779,8 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
         limitPriceBn
           .mul(maxBaseQtyBn)
           .mul(market.decoded["quoteLotSize"])
-          .toNumber() * feeMultiplier,
-      ),
+          .toNumber() * feeMultiplier
+      )
     );
 
     let ooKey;
@@ -792,7 +792,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
           symbol,
           this.program.programId.equals(ZERO_ONE_DEVNET_PROGRAM_ID)
             ? Cluster.Devnet
-            : Cluster.Mainnet,
+            : Cluster.Mainnet
         )
       )[0];
       createOo = true;
@@ -841,7 +841,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
                   openOrders: ooKey,
                   dexMarket: this.state.getMarketKeyBySymbol(symbol),
                   dexProgram: this.program.programId.equals(
-                    ZERO_ONE_DEVNET_PROGRAM_ID,
+                    ZERO_ONE_DEVNET_PROGRAM_ID
                   )
                     ? ZO_DEX_DEVNET_PROGRAM_ID
                     : ZO_DEX_MAINNET_PROGRAM_ID,
@@ -851,7 +851,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
               }),
             ]
           : undefined,
-      },
+      }
     );
   }
 
@@ -885,7 +885,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
   }>): Promise<TransactionId> {
     if (this.state.data.totalCollaterals < 1) {
       throw new Error(
-        `<State ${this.state.pubkey.toString()}> does not have a base collateral`,
+        `<State ${this.state.pubkey.toString()}> does not have a base collateral`
       );
     }
 
@@ -899,7 +899,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
       {},
       this.program.programId.equals(ZERO_ONE_DEVNET_PROGRAM_ID)
         ? SERUM_DEVNET_SPOT_PROGRAM_ID
-        : SERUM_MAINNET_SPOT_PROGRAM_ID,
+        : SERUM_MAINNET_SPOT_PROGRAM_ID
     );
 
     const colIdx = this.state.getCollateralIndex(tokenMint);
@@ -915,7 +915,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
         ? new BN(1)
         : new Num(
             (toSize * (1 - slippage)) / fromSize,
-            buy ? baseDecimals : USDC_DECIMALS,
+            buy ? baseDecimals : USDC_DECIMALS
           ).n;
 
     if (
@@ -925,7 +925,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
       throw new Error(
         `Invalid <SerumSpotMarket ${serumMarket}> for swap:\n` +
           `  swap wants:   base=${tokenMint}, quote=${stateQuoteMint}\n` +
-          `  market wants: base=${market.baseMintAddress}, quote=${market.quoteMintAddress}`,
+          `  market wants: base=${market.baseMintAddress}, quote=${market.quoteMintAddress}`
       );
     }
 
@@ -936,7 +936,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
       ],
       this.program.programId.equals(ZERO_ONE_DEVNET_PROGRAM_ID)
         ? SERUM_DEVNET_SPOT_PROGRAM_ID
-        : SERUM_MAINNET_SPOT_PROGRAM_ID,
+        : SERUM_MAINNET_SPOT_PROGRAM_ID
     );
 
     return await this.program.rpc.swap(buy, allowBorrow, amount, minRate, {
@@ -962,7 +962,7 @@ export default class MarginWeb3 extends BaseAccount<MarginClassSchema> {
         serumPcVault: market.decoded.quoteVault,
         serumVaultSigner: vaultSigner,
         srmSpotProgram: this.program.programId.equals(
-          ZERO_ONE_DEVNET_PROGRAM_ID,
+          ZERO_ONE_DEVNET_PROGRAM_ID
         )
           ? SERUM_DEVNET_SPOT_PROGRAM_ID
           : SERUM_MAINNET_SPOT_PROGRAM_ID,

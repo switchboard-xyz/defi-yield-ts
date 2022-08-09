@@ -1,17 +1,17 @@
-import State from "../State";
-import Margin from "./Margin";
+import State from "../State.js";
+import Margin from "./Margin.js";
 import EventEmitter from "eventemitter3";
 import { UpdateEvents } from "./UpdateEvents";
 import { Program } from "@project-serum/anchor";
-import { Zo } from "../../types/zo";
+import { Zo } from "../../types/zo.js";
 import { KeyedAccountInfo } from "@solana/web3.js";
 import {
   DEFAULT_MARGINS_CLUSTER_CONFIG,
   MarginsClusterConfig,
   ZO_DEVNET_STATE_KEY,
   ZO_MAINNET_STATE_KEY,
-} from "../../config";
-import { Cluster } from "../../utils";
+} from "../../config.js";
+import { Cluster } from "../../utils/index.js";
 
 export default class MarginsCluster {
   margins: { [key: string]: Margin } = {};
@@ -26,7 +26,7 @@ export default class MarginsCluster {
   constructor(
     public readonly program: Program<Zo>,
     public readonly cluster: Cluster,
-    readonly config: MarginsClusterConfig = DEFAULT_MARGINS_CLUSTER_CONFIG,
+    readonly config: MarginsClusterConfig = DEFAULT_MARGINS_CLUSTER_CONFIG
   ) {}
 
   hardRefreshIntervalId: any;
@@ -37,7 +37,7 @@ export default class MarginsCluster {
       this.program,
       this.cluster == Cluster.Devnet
         ? ZO_DEVNET_STATE_KEY
-        : ZO_MAINNET_STATE_KEY,
+        : ZO_MAINNET_STATE_KEY
     );
     await this.state.subscribe({
       cacheRefreshInterval: this.config.cacheRefreshInterval,
@@ -51,7 +51,7 @@ export default class MarginsCluster {
     this.startControlsListener();
     this.hardRefreshIntervalId = setInterval(
       () => that.hardRefreshAccounts(),
-      this.config.hardRefreshInterval,
+      this.config.hardRefreshInterval
     );
     this.log("MarginsCluster listeners launched");
     this.eventEmitter!.emit(UpdateEvents.marginsReloaded, null);
@@ -60,10 +60,10 @@ export default class MarginsCluster {
 
   async hardRefreshAccounts() {
     await this.program.provider.connection.removeProgramAccountChangeListener(
-      this.controlListener,
+      this.controlListener
     );
     await this.program.provider.connection.removeProgramAccountChangeListener(
-      this.marginListener,
+      this.marginListener
     );
     this.margins = {};
     this.controlToMarginKey = new Map();
@@ -80,7 +80,7 @@ export default class MarginsCluster {
       this.state,
       null,
       this.config.verbose,
-      this.config.loadWithOrders,
+      this.config.loadWithOrders
     );
     this.margins = {};
     for (const rawMargin of rawMargins) {
@@ -89,7 +89,7 @@ export default class MarginsCluster {
     for (const margin of Object.values(this.margins)) {
       this.controlToMarginKey.set(
         margin.control.pubkey.toString(),
-        margin.pubkey.toString(),
+        margin.pubkey.toString()
       );
     }
   }
@@ -105,7 +105,7 @@ export default class MarginsCluster {
             const pubkey = account.accountId;
             if (that.margins[pubkey.toString()]) {
               await that.margins[pubkey.toString()]!.updateWithAccountInfo(
-                accountInfo,
+                accountInfo
               );
             } else {
               that.margins[pubkey.toString()] =
@@ -113,23 +113,23 @@ export default class MarginsCluster {
                   that.program,
                   that.state,
                   accountInfo,
-                  this.config.loadWithOrders,
+                  this.config.loadWithOrders
                 );
               that.controlToMarginKey.set(
                 that.margins[pubkey.toString()]!.control.pubkey.toString(),
-                that.margins[pubkey.toString()]!.pubkey.toString(),
+                that.margins[pubkey.toString()]!.pubkey.toString()
               );
             }
             that.eventEmitter!.emit(
               UpdateEvents.marginModified,
-              pubkey.toString(),
+              pubkey.toString()
             );
           } catch (_) {
             console.warn("Failed to load an updated margin account!");
           }
         },
         "confirmed",
-        [{ dataSize: that.program.account["margin"].size }],
+        [{ dataSize: that.program.account["margin"].size }]
       );
   }
 
@@ -145,7 +145,7 @@ export default class MarginsCluster {
             const marginKey = that.controlToMarginKey.get(pubkey.toString());
             if (marginKey) {
               await that.margins[marginKey]!.updateControlFromAccountInfo(
-                accountInfo,
+                accountInfo
               );
               that.eventEmitter!.emit(UpdateEvents.controlModified, marginKey);
             }
@@ -154,7 +154,7 @@ export default class MarginsCluster {
           }
         },
         "confirmed",
-        [{ dataSize: that.program.account["control"].size }],
+        [{ dataSize: that.program.account["control"].size }]
       );
   }
 
@@ -162,10 +162,10 @@ export default class MarginsCluster {
     clearInterval(this.hardRefreshIntervalId);
     await this.state.unsubscribe();
     await this.program.provider.connection.removeProgramAccountChangeListener(
-      this.controlListener,
+      this.controlListener
     );
     await this.program.provider.connection.removeProgramAccountChangeListener(
-      this.marginListener,
+      this.marginListener
     );
     this.eventEmitter?.removeAllListeners();
     this.eventEmitter = null;

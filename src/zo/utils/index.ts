@@ -20,7 +20,7 @@ import { Program, Provider } from "@project-serum/anchor";
 import BN from "bn.js";
 import Decimal from "decimal.js";
 import { blob, struct, u8 } from "buffer-layout";
-import { Zo } from "../types";
+import { Zo } from "../types/zo.js";
 import {
   IDL,
   RENT_PROGRAM_ID,
@@ -29,10 +29,10 @@ import {
   ZERO_ONE_MAINNET_PROGRAM_ID,
 } from "../config";
 
-export * from "../types/dataTypes";
+export * from "../types/dataTypes.js";
 
-export * from "./rpc";
-export * from "./units";
+export * from "./rpc.js";
+export * from "./units.js";
 
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -45,7 +45,7 @@ export enum Cluster {
 
 export function createProgram(
   provider: Provider,
-  cluster: Cluster,
+  cluster: Cluster
 ): Program<Zo> {
   if (cluster === Cluster.Devnet) {
     return new Program<Zo>(IDL, ZERO_ONE_DEVNET_PROGRAM_ID, provider);
@@ -56,7 +56,7 @@ export function createProgram(
 
 export function loadWI80F48({ data }: { data: BN }): Decimal {
   return new Decimal(
-    `${data.isNeg() ? "-" : ""}0b${data.abs().toString(2)}p-48`,
+    `${data.isNeg() ? "-" : ""}0b${data.abs().toString(2)}p-48`
   );
 }
 
@@ -95,7 +95,7 @@ export function findLastIndexOf<T>(l: readonly T[], p: (T) => boolean) {
 
 export async function getMintInfo(
   provider: Provider,
-  pubkey: PublicKey,
+  pubkey: PublicKey
 ): Promise<MintInfo> {
   const data = (await provider.connection.getAccountInfo(pubkey))?.data;
   if (!data) throw Error(`Couldn't load mint data for ${pubkey.toBase58()}`);
@@ -114,7 +114,7 @@ export async function createMintIxs(
   provider: Provider,
   authority: PublicKey,
   decimals: number,
-  freezeAuthority?: PublicKey,
+  freezeAuthority?: PublicKey
 ): Promise<TransactionInstruction[]> {
   return [
     SystemProgram.createAccount({
@@ -129,7 +129,7 @@ export async function createMintIxs(
       mint.publicKey,
       decimals,
       authority,
-      freezeAuthority ?? null,
+      freezeAuthority ?? null
     ),
   ];
 }
@@ -138,7 +138,7 @@ export async function createTokenAccountIxs(
   vault: Keypair,
   provider: Provider,
   mint: PublicKey,
-  owner: PublicKey,
+  owner: PublicKey
 ): Promise<TransactionInstruction[]> {
   return [
     SystemProgram.createAccount({
@@ -146,7 +146,7 @@ export async function createTokenAccountIxs(
       newAccountPubkey: vault.publicKey,
       space: AccountLayout.span,
       lamports: await Token.getMinBalanceRentForExemptAccount(
-        provider.connection,
+        provider.connection
       ),
       programId: TOKEN_PROGRAM_ID,
     }),
@@ -154,7 +154,7 @@ export async function createTokenAccountIxs(
       TOKEN_PROGRAM_ID,
       mint,
       vault.publicKey,
-      owner,
+      owner
     ),
   ];
 }
@@ -163,7 +163,7 @@ export function createMintToIxs(
   mint: PublicKey,
   dest: PublicKey,
   authority: PublicKey,
-  amount: number,
+  amount: number
 ): TransactionInstruction[] {
   return [
     Token.createMintToInstruction(
@@ -172,7 +172,7 @@ export function createMintToIxs(
       dest,
       authority,
       [],
-      amount,
+      amount
     ),
   ];
 }
@@ -181,7 +181,7 @@ export async function createMint(
   provider: Provider,
   authority: PublicKey,
   decimals: number,
-  freezeAuthority?: PublicKey,
+  freezeAuthority?: PublicKey
 ): Promise<PublicKey> {
   const mint = new Keypair();
   const tx = new Transaction();
@@ -191,8 +191,8 @@ export async function createMint(
       provider,
       authority,
       decimals,
-      freezeAuthority,
-    )),
+      freezeAuthority
+    ))
   );
   await provider.send(tx, [mint]);
   return mint.publicKey;
@@ -201,7 +201,7 @@ export async function createMint(
 export async function createTokenAccount(
   provider: Provider,
   mint: PublicKey,
-  owner: PublicKey,
+  owner: PublicKey
 ): Promise<PublicKey> {
   const vault = Keypair.generate();
   const tx = new Transaction();
@@ -212,7 +212,7 @@ export async function createTokenAccount(
 
 export async function findAssociatedTokenAddress(
   walletAddress: PublicKey,
-  tokenMintAddress: PublicKey,
+  tokenMintAddress: PublicKey
 ): Promise<PublicKey> {
   return (
     await PublicKey.findProgramAddress(
@@ -221,7 +221,7 @@ export async function findAssociatedTokenAddress(
         TOKEN_PROGRAM_ID.toBuffer(),
         tokenMintAddress.toBuffer(),
       ],
-      ASSOCIATED_TOKEN_PROGRAM_ID,
+      ASSOCIATED_TOKEN_PROGRAM_ID
     )
   )[0];
 }
@@ -229,7 +229,7 @@ export async function findAssociatedTokenAddress(
 export function getAssociatedTokenTransactionWithPayer(
   tokenMintAddress: PublicKey,
   associatedTokenAddress: PublicKey,
-  owner: PublicKey,
+  owner: PublicKey
 ) {
   const keys = [
     {
@@ -280,7 +280,7 @@ export async function mintTo(
   provider: Provider,
   mint: PublicKey,
   dest: PublicKey,
-  amount: number,
+  amount: number
 ): Promise<void> {
   const tx = new Transaction();
   tx.add(...createMintToIxs(mint, dest, provider.wallet.publicKey, amount));
@@ -289,7 +289,7 @@ export async function mintTo(
 
 export function throwIfNull<T>(
   value: T | null,
-  message = "account not found",
+  message = "account not found"
 ): T {
   if (value === null) {
     throw new Error(message);
@@ -301,14 +301,14 @@ const MINT_LAYOUT = struct([blob(44), u8("decimals"), blob(37)]);
 
 export async function getMintDecimals(
   connection: Connection,
-  mint: PublicKey,
+  mint: PublicKey
 ): Promise<number> {
   if (mint.equals(WRAPPED_SOL_MINT)) {
     return 9;
   }
   const { data } = throwIfNull(
     await connection.getAccountInfo(mint),
-    "mint not found",
+    "mint not found"
   );
   const { decimals } = MINT_LAYOUT.decode(data);
   return decimals;
@@ -316,7 +316,7 @@ export async function getMintDecimals(
 
 export async function getWrappedSolInstructionsAndKey(
   initialSmollAmount,
-  provider,
+  provider
 ): Promise<{
   createTokenAccountIx: TransactionInstruction;
   initTokenAccountIx: TransactionInstruction;
@@ -329,7 +329,7 @@ export async function getWrappedSolInstructionsAndKey(
   const intermediary = intermediaryKeypair.publicKey;
 
   const rent = await provider.connection.getMinimumBalanceForRentExemption(
-    TokenAccountLayout.span,
+    TokenAccountLayout.span
   );
   const createTokenAccountIx = SystemProgram.createAccount({
     fromPubkey: provider.wallet.publicKey,
@@ -343,7 +343,7 @@ export async function getWrappedSolInstructionsAndKey(
     TOKEN_PROGRAM_ID,
     WRAPPED_SOL_MINT,
     intermediary,
-    provider.wallet.publicKey,
+    provider.wallet.publicKey
   );
 
   const closeTokenAccountIx = Token.createCloseAccountInstruction(
@@ -351,7 +351,7 @@ export async function getWrappedSolInstructionsAndKey(
     intermediary,
     provider.wallet.publicKey,
     provider.wallet.publicKey,
-    [],
+    []
   );
 
   return {

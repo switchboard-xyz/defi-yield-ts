@@ -1,6 +1,12 @@
 import BN from "bn.js";
 import { blob, offset, seq, struct, u32, u8, union } from "buffer-layout";
-import { publicKeyLayout, setLayoutDecoder, u128, u64, zeros } from "./layout";
+import {
+  publicKeyLayout,
+  setLayoutDecoder,
+  u128,
+  u64,
+  zeros,
+} from "./layout.js";
 import { PublicKey } from "@solana/web3.js";
 
 const SLAB_HEADER_LAYOUT = struct(
@@ -19,7 +25,7 @@ const SLAB_HEADER_LAYOUT = struct(
     u32("leafCount"),
     zeros(4),
   ],
-  "header",
+  "header"
 );
 
 const SLAB_NODE_LAYOUT = union(u32("tag"), blob(68), "node");
@@ -32,7 +38,7 @@ SLAB_NODE_LAYOUT.addVariant(
     u128("key"),
     seq(u32(), 2, "children"),
   ]),
-  "innerNode",
+  "innerNode"
 );
 SLAB_NODE_LAYOUT.addVariant(
   2,
@@ -45,7 +51,7 @@ SLAB_NODE_LAYOUT.addVariant(
     u64("quantity"), // In units of lot size
     u64("clientOrderId"),
   ]),
-  "leafNode",
+  "leafNode"
 );
 SLAB_NODE_LAYOUT.addVariant(3, struct([u32("next")]), "freeNode");
 SLAB_NODE_LAYOUT.addVariant(4, struct([]), "lastFreeNode");
@@ -56,9 +62,9 @@ export const SLAB_LAYOUT = struct([
     SLAB_NODE_LAYOUT,
     offset(
       SLAB_HEADER_LAYOUT.layoutFor("bumpIndex"),
-      SLAB_HEADER_LAYOUT.offsetOf("bumpIndex") - SLAB_HEADER_LAYOUT.span,
+      SLAB_HEADER_LAYOUT.offsetOf("bumpIndex") - SLAB_HEADER_LAYOUT.span
     ),
-    "nodes",
+    "nodes"
   ),
 ]);
 

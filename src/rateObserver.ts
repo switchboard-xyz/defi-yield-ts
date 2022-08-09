@@ -1,15 +1,12 @@
 import { Connection, PublicKey } from "@solana/web3.js";
-import * as apricot from "./adapters/apricot";
-//import * as francium from './adapters/francium';
-import * as jet from "./adapters/jet";
-//import * as larix from './adapters/larix';
-import * as mango from "./adapters/mango";
-import * as port from "./adapters/port";
-import * as solend from "./adapters/solend";
-//import * as tulip from './adapters/tulip';
-import * as zo from "./adapters/zo";
+import * as apricot from "./adapters/apricot.js";
+import * as jet from "./adapters/jet.js";
+import * as mango from "./adapters/mango.js";
+import * as port from "./adapters/port.js";
+import * as solend from "./adapters/solend.js";
+import * as zo from "./adapters/zo.js";
 import TOKENS from "./tokens.json";
-import { Protocol, ProtocolRates } from "./types";
+import { Protocol, ProtocolRates } from "./types.js";
 
 export class RateObserver {
   async fetch(

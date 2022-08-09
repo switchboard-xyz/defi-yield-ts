@@ -1,7 +1,7 @@
-import Num from "../Num"
-import Decimal from "decimal.js"
-import { PublicKey } from "@solana/web3.js"
-import BN from "bn.js"
+import Num from "../Num.js";
+import Decimal from "decimal.js";
+import { PublicKey } from "@solana/web3.js";
+import BN from "bn.js";
 
 export enum MarketType {
   Perp,
@@ -36,12 +36,11 @@ export interface PositionInfo {
  * @isLong - long
  */
 export interface OOInfo {
-  long: Decimal,
-  short: Decimal,
-  posSize: Decimal,
-  isLong: boolean,
+  long: Decimal;
+  short: Decimal;
+  posSize: Decimal;
+  isLong: boolean;
 }
-
 
 /**
  *   @pubKey: public key
@@ -98,18 +97,18 @@ export interface MarketInfo {
  *   @vault - vault key
  */
 export type AssetInfo = {
-  decimals: number,
-  weight: number,
-  liqFee: number,
-  isBorrowable: boolean,
-  optimalUtil: number,
-  optimalRate: number,
-  maxRate: number,
-  ogFee: number,
-  isSwappable: boolean,
-  serumOpenOrders: PublicKey,
-  maxDeposit: Decimal,
-  dustThreshold: Num,
+  decimals: number;
+  weight: number;
+  liqFee: number;
+  isBorrowable: boolean;
+  optimalUtil: number;
+  optimalRate: number;
+  maxRate: number;
+  ogFee: number;
+  isSwappable: boolean;
+  serumOpenOrders: PublicKey;
+  maxDeposit: Decimal;
+  dustThreshold: Num;
   symbol: string;
   indexPrice: Num;
   supply: Decimal;
@@ -119,7 +118,6 @@ export type AssetInfo = {
   mint: PublicKey;
   vault: PublicKey;
 };
-
 
 /**
  * @price

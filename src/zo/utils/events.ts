@@ -1,6 +1,6 @@
 import { BorshCoder, Idl } from "@project-serum/anchor";
-import { DEX_IDL } from "../types/dex";
-import { IDL } from "../types/zo";
+import { DEX_IDL } from "../types/dex.js";
+import { IDL } from "../types/zo.js";
 
 function decodeMsg(coder: BorshCoder<string>, msg: string) {
   const event = coder.events.decode(msg);

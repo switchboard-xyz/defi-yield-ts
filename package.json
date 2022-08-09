@@ -1,16 +1,23 @@
 {
   "name": "@switchboard-xyz/defi-yield-ts",
   "version": "1.0.6",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/cjs/index.d.ts",
   "license": "AGPL-3.0-or-later",
   "files": [
     "dist",
     "package.json",
     "yarn.lock"
   ],
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
   "scripts": {
-    "build": "rm -rf dist/ && tsc",
+    "build": "shx rm -rf dist; tsc && tsc -p tsconfig.cjs.json",
     "test-all": "mocha -r ts-node/register test/all.test.ts --timeout 0",
     "test-apricot": "mocha -r ts-node/register test/apricot.test.ts --timeout 0",
     "test-francium": "mocha -r ts-node/register test/francium.test.ts --timeout 0",
@@ -52,6 +59,7 @@
     "@types/mocha": "^9.1.0",
     "chai": "^4.3.6",
     "mocha": "^9.2.0",
+    "shx": "^0.3.4",
     "ts-node": "^10.5.0",
     "tslib": "^2.3.1",
     "typescript": "^4.5.5"

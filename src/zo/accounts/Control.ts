@@ -1,7 +1,7 @@
 import { AccountInfo, PublicKey } from "@solana/web3.js";
 import { Program } from "@project-serum/anchor";
-import BaseAccount from "./BaseAccount";
-import { ControlSchema, ControlSchema as Schema, Zo } from "../types";
+import BaseAccount from "./BaseAccount.js";
+import { ControlSchema, ControlSchema as Schema, Zo } from "../types.js";
 
 /**
  * The Control account tracks a user's open orders and positions across all markets.
@@ -25,18 +25,18 @@ export default class Control extends BaseAccount<Schema> {
   static async loadPrefetched(
     program: Program<Zo>,
     k: PublicKey,
-    prefetchedControlData: ControlSchema,
+    prefetchedControlData: ControlSchema
   ) {
     return new this(program, k, prefetchedControlData);
   }
 
   private static async fetch(
     program: Program<Zo>,
-    k: PublicKey,
+    k: PublicKey
   ): Promise<Schema> {
     const data = (await program.account["control"].fetch(
       k,
-      "recent",
+      "recent"
     )) as unknown as Schema;
     return {
       ...data,

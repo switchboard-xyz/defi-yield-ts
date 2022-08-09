@@ -1,13 +1,13 @@
 import { AccountInfo, Commitment, PublicKey } from "@solana/web3.js";
 import { Program, ProgramAccount } from "@project-serum/anchor";
-import State from "../State";
-import Num from "../../Num";
+import State from "../State.js";
+import Num from "../../Num.js";
 import Decimal from "decimal.js";
-import { OOInfo, PositionInfo, TradeInfo } from "../../types/dataTypes";
-import MarginWeb3 from "./MarginWeb3";
-import { Zo } from "../../types/zo";
-import Cache from "../Cache";
-import { ControlSchema, MarginSchema } from "../../types";
+import { OOInfo, PositionInfo, TradeInfo } from "../../types/dataTypes.js";
+import MarginWeb3 from "./MarginWeb3.js";
+import { Zo } from "../../types/zo.js";
+import Cache from "../Cache.js";
+import { ControlSchema, MarginSchema } from "src/zo/types.js";
 
 /**
  * The margin account is a PDA generated using
@@ -25,7 +25,7 @@ export default abstract class Margin extends MarginWeb3 {
   static async create(
     program: Program<Zo>,
     st: State,
-    commitment: Commitment = "finalized",
+    commitment: Commitment = "finalized"
   ): Promise<Margin> {
     return (await MarginWeb3.create(program, st, commitment)) as Margin;
   }
@@ -36,7 +36,7 @@ export default abstract class Margin extends MarginWeb3 {
   static async exists(
     program: Program<Zo>,
     st: State,
-    owner?: PublicKey,
+    owner?: PublicKey
   ): Promise<boolean> {
     const marginOwner = owner || program.provider.wallet.publicKey;
     const [key] = await this.getMarginKey(st, marginOwner, program);
@@ -46,7 +46,7 @@ export default abstract class Margin extends MarginWeb3 {
   static async getMarginKey(
     st: State,
     marginOwner: PublicKey,
-    program: Program<Zo>,
+    program: Program<Zo>
   ) {
     return await this.getPda(st, marginOwner, program.programId);
   }
@@ -79,7 +79,7 @@ export default abstract class Margin extends MarginWeb3 {
     const balances: { [key: string]: Num } = { ...this._balances };
     balances["USDC"] = new Num(
       this._balances["USDC"]!.decimal.add(this.realizedPnL).add(this.funding),
-      this._balances["USDC"]!.decimals,
+      this._balances["USDC"]!.decimals
     );
     return balances;
   }
@@ -92,8 +92,8 @@ export default abstract class Margin extends MarginWeb3 {
     for (const marketKey of Object.keys(this.balances)) {
       depositedCollateral = depositedCollateral.add(
         this.balances[marketKey]!.decimal.mul(
-          this.state.assets[marketKey]!.indexPrice.decimal,
-        ),
+          this.state.assets[marketKey]!.indexPrice.decimal
+        )
       );
     }
 
@@ -148,7 +148,7 @@ export default abstract class Margin extends MarginWeb3 {
     }
     return Decimal.min(
       this.weightedAccountValue,
-      this.weightedCollateralValue,
+      this.weightedCollateralValue
     ).div(this.totalOpenPositionNotional);
   }
 
@@ -309,7 +309,7 @@ export default abstract class Margin extends MarginWeb3 {
    */
   get tiedCollateral() {
     return this.borrowLendingTiedCollateralValue.add(
-      this.positionsTiedCollateral,
+      this.positionsTiedCollateral
     );
   }
 
@@ -319,7 +319,7 @@ export default abstract class Margin extends MarginWeb3 {
   get freeCollateralValue() {
     const freeCollateral = Decimal.min(
       this.weightedAccountValue,
-      this.weightedCollateralValue,
+      this.weightedCollateralValue
     ).minus(this.tiedCollateral);
     return Decimal.max(new Decimal(0), freeCollateral);
   }
@@ -350,14 +350,14 @@ export default abstract class Margin extends MarginWeb3 {
       if (this.balances[assetKey]!.number >= 0) {
         depositedCollateral = depositedCollateral.add(
           this.balances[assetKey]!.decimal.mul(
-            this.state.assets[assetKey]!.indexPrice.decimal,
-          ).mul(this.state.assets[assetKey]!.weight / 1000),
+            this.state.assets[assetKey]!.indexPrice.decimal
+          ).mul(this.state.assets[assetKey]!.weight / 1000)
         );
       } else {
         depositedCollateral = depositedCollateral.add(
           this.balances[assetKey]!.decimal.mul(
-            this.state.assets[assetKey]!.indexPrice.decimal,
-          ),
+            this.state.assets[assetKey]!.indexPrice.decimal
+          )
         );
       }
     }
@@ -401,13 +401,13 @@ export default abstract class Margin extends MarginWeb3 {
     for (const marketKey of Object.keys(this.balances)) {
       if (this.balances[marketKey]!.number < 0) {
         const borrowNotional = this.balances[marketKey]!.decimal.mul(
-          this.state.assets[marketKey]!.indexPrice.decimal,
+          this.state.assets[marketKey]!.indexPrice.decimal
         );
         tiedCollateral = tiedCollateral.add(
           new Decimal(1.1)
             .div(this.state.assets[marketKey]!.weight / 1000)
             .minus(1)
-            .mul(borrowNotional.abs()),
+            .mul(borrowNotional.abs())
         );
       }
     }
@@ -423,8 +423,8 @@ export default abstract class Margin extends MarginWeb3 {
       if (this.balances[marketKey]!.number < 0) {
         bnlPositionNotional = bnlPositionNotional.add(
           this.balances[marketKey]!.decimal.mul(
-            this.state.assets[marketKey]!.indexPrice.decimal,
-          ),
+            this.state.assets[marketKey]!.indexPrice.decimal
+          )
         );
       }
     }
@@ -443,7 +443,7 @@ export default abstract class Margin extends MarginWeb3 {
           .div(this.state.assets[marketKey]!.weight / 1000)
           .minus(new Decimal(1));
         const weight = this.balances[marketKey]!.decimal.mul(
-          this.state.assets[marketKey]!.indexPrice.decimal,
+          this.state.assets[marketKey]!.indexPrice.decimal
         );
         imfWeightedTotal = imfWeightedTotal.add(weight.mul(factor));
         imfWeight = imfWeight.add(weight);
@@ -478,14 +478,14 @@ export default abstract class Margin extends MarginWeb3 {
     let tiedCollateral = new Decimal(0);
     for (const marketKey of Object.keys(this.state.markets)) {
       const posNotional = posInfos[marketKey]!.posSize.mul(
-        this.state.markets[marketKey]!.indexPrice.decimal,
+        this.state.markets[marketKey]!.indexPrice.decimal
       );
       const openSize = Decimal.max(
         posInfos[marketKey]!.long,
-        posInfos[marketKey]!.short,
+        posInfos[marketKey]!.short
       );
       tiedCollateral = tiedCollateral.add(
-        this.state.markets[marketKey]!.baseImf.mul(openSize.add(posNotional)),
+        this.state.markets[marketKey]!.baseImf.mul(openSize.add(posNotional))
       );
     }
     return tiedCollateral;
@@ -503,7 +503,7 @@ export default abstract class Margin extends MarginWeb3 {
     const imfBase = (1.1 * 1000) / assetBorrowed.weight - 1;
     const [initialMarginTotalWeighted, _] = this.initialMarginInfo(null);
     const numerator = initialMarginTotalWeighted.minus(
-      Decimal.min(this.weightedAccountValue, this.weightedCollateralValue),
+      Decimal.min(this.weightedAccountValue, this.weightedCollateralValue)
     );
 
     const denominator = assetBorrowed.indexPrice.decimal.mul(imfBase).mul(
@@ -511,8 +511,8 @@ export default abstract class Margin extends MarginWeb3 {
         new Decimal(assetBorrowed.weight / 1000)
           .mul(1 + liquidationFee)
           .minus(1)
-          .div(imfBase),
-      ),
+          .div(imfBase)
+      )
     );
     return numerator.div(denominator);
   }
@@ -543,11 +543,11 @@ export default abstract class Margin extends MarginWeb3 {
     for (const order of this.orders) {
       if (order.long) {
         posInfos[order.marketKey]!.long = posInfos[order.marketKey]!.long.add(
-          order.coins.decimal,
+          order.coins.decimal
         );
       } else {
         posInfos[order.marketKey]!.short = posInfos[order.marketKey]!.short.add(
-          order.coins.decimal,
+          order.coins.decimal
         );
       }
     }
@@ -564,11 +564,11 @@ export default abstract class Margin extends MarginWeb3 {
     program: Program<Zo>,
     st: State,
     ch?: Cache,
-    owner?: PublicKey,
+    owner?: PublicKey
   ): Promise<Margin> {
     if (ch)
       console.warn(
-        "[DEPRECATED SOON: Cache param will soon be removed from here; cache is taken from state directly.]",
+        "[DEPRECATED SOON: Cache param will soon be removed from here; cache is taken from state directly.]"
       );
     return (await super.loadWeb3(program, st, owner)) as Margin;
   }
@@ -579,18 +579,18 @@ export default abstract class Margin extends MarginWeb3 {
     ch: Cache | null,
     prefetchedMarginData: ProgramAccount<MarginSchema>,
     prefetchedControlData: ProgramAccount<ControlSchema>,
-    withOrders: boolean,
+    withOrders: boolean
   ): Promise<Margin> {
     if (ch)
       console.warn(
-        "[DEPRECATED SOON: Cache param will soon be removed from here; cache is taken from state directly.]",
+        "[DEPRECATED SOON: Cache param will soon be removed from here; cache is taken from state directly.]"
       );
     return (await super.loadPrefetchedWeb3(
       program,
       st,
       prefetchedMarginData,
       prefetchedControlData,
-      withOrders,
+      withOrders
     )) as Margin;
   }
 
@@ -598,13 +598,13 @@ export default abstract class Margin extends MarginWeb3 {
     program: Program<Zo>,
     st: State,
     accountInfo: AccountInfo<Buffer>,
-    withOrders: boolean,
+    withOrders: boolean
   ): Promise<Margin> {
     return (await super.loadFromAccountInfo(
       program,
       st,
       accountInfo,
-      withOrders,
+      withOrders
     )) as Margin;
   }
 
@@ -621,15 +621,15 @@ export default abstract class Margin extends MarginWeb3 {
     st: State,
     ch: Cache | null = null,
     verbose = false,
-    withOrders = true,
+    withOrders = true
   ) {
     if (ch) {
       console.warn(
-        "[DEPRECATED SOON: Cache param will soon be removed from here, and will be fetched from state directly.]",
+        "[DEPRECATED SOON: Cache param will soon be removed from here, and will be fetched from state directly.]"
       );
     }
     const marginAndControlSchemas = await this.loadAllMarginAndControlSchemas(
-      program,
+      program
     );
     const margins: Margin[] = [];
     console.log(marginAndControlSchemas.length, " schemas loaded");
@@ -645,8 +645,8 @@ export default abstract class Margin extends MarginWeb3 {
           null,
           marginAndControlSchema.marginSchema,
           marginAndControlSchema.controlSchema,
-          withOrders,
-        ),
+          withOrders
+        )
       );
       if (verbose) this.printMarginsLoadProgress(index, len);
     }
@@ -665,8 +665,8 @@ export default abstract class Margin extends MarginWeb3 {
     const empty = " ".repeat(left);
     process.stdout.write(
       `\r[${dots}${empty}] ${((i * 100) / size).toFixed(
-        2,
-      )}% ${index}/${len} Loaded`,
+        2
+      )}% ${index}/${len} Loaded`
     );
   }
 
@@ -758,13 +758,13 @@ export default abstract class Margin extends MarginWeb3 {
       let addOn = this._ooInfos[marketKey]!.posSize;
       if (trade && marketKey == trade.marketKey) {
         addOn = this._ooInfos[marketKey]!.posSize.mul(
-          this._ooInfos[marketKey]!.isLong ? 1 : -1,
+          this._ooInfos[marketKey]!.isLong ? 1 : -1
         )
           .add(trade.coins * (trade.long ? 1 : -1))
           .abs();
       }
       const posNotional = addOn.mul(
-        this.state.markets[marketKey]!.indexPrice.decimal,
+        this.state.markets[marketKey]!.indexPrice.decimal
       );
       imfWeight = imfWeight.add(posNotional);
       const pimf = this.state.markets[marketKey]!.pmmf.mul(2);
@@ -800,8 +800,8 @@ export default abstract class Margin extends MarginWeb3 {
           balance,
           this.freeCollateralValue
             .div(this.state.assets[assetKey]!.indexPrice.decimal)
-            .div(this.state.assets[assetKey]!.weight / 1000),
-        ),
+            .div(this.state.assets[assetKey]!.weight / 1000)
+        )
       );
 
       if (res.toNumber() != balance.toNumber()) {
@@ -820,7 +820,7 @@ export default abstract class Margin extends MarginWeb3 {
   collateralWithdrawableWithBorrow(assetKey: string) {
     if (this.state.assets[assetKey]) {
       const availableFreeWithdrawalNotional = this.collateralWithdrawable(
-        assetKey,
+        assetKey
       ).mul(this.state.assets[assetKey]!.indexPrice.decimal);
       const factor = new Decimal(1.1)
         .div(this.state.assets[assetKey]!.weight / 1000)
@@ -858,13 +858,13 @@ export default abstract class Margin extends MarginWeb3 {
     if (this.totalOpenPositionNotional.toNumber() === 0) {
       return Decimal.min(
         this.weightedAccountValue,
-        this.weightedCollateralValue,
+        this.weightedCollateralValue
       )
         .div(marketInfo.baseImf)
         .mul(
           trade.postOrder
             ? 1 - MAKER_TRADE_FEE - VALUE_NERF
-            : 1 - TAKER_TRADE_FEE - VALUE_NERF,
+            : 1 - TAKER_TRADE_FEE - VALUE_NERF
         )
         .div(markPrice.decimal)
         .toNumber();
@@ -876,7 +876,7 @@ export default abstract class Margin extends MarginWeb3 {
       .div(markPrice.decimal);
     const maxOpenSize = Decimal.max(
       this._ooInfos[marketInfo.symbol]!.long,
-      this._ooInfos[marketInfo.symbol]!.short,
+      this._ooInfos[marketInfo.symbol]!.short
     ).add(changeInOpenSizeAllowed);
 
     if (trade.long) {
@@ -884,7 +884,7 @@ export default abstract class Margin extends MarginWeb3 {
         feeMultiplier *
         Decimal.max(
           new Decimal(0),
-          maxOpenSize.minus(this._ooInfos[marketInfo.symbol]!.long),
+          maxOpenSize.minus(this._ooInfos[marketInfo.symbol]!.long)
         ).toNumber()
       );
     }
@@ -892,7 +892,7 @@ export default abstract class Margin extends MarginWeb3 {
       feeMultiplier *
       Decimal.max(
         new Decimal(0),
-        maxOpenSize.minus(this._ooInfos[marketInfo.symbol]!.short),
+        maxOpenSize.minus(this._ooInfos[marketInfo.symbol]!.short)
       ).toNumber()
     );
   }
@@ -912,7 +912,7 @@ export default abstract class Margin extends MarginWeb3 {
    */
   private positionWeighted(marketKey: string) {
     const posNotional = this._ooInfos[marketKey]!.posSize.mul(
-      this.state.markets[marketKey]!.indexPrice.decimal,
+      this.state.markets[marketKey]!.indexPrice.decimal
     );
     const pmmf = this.state.markets[marketKey]!.pmmf;
     const positionWeighted = pmmf.mul(posNotional);
@@ -929,7 +929,7 @@ export default abstract class Margin extends MarginWeb3 {
       .div(this.state.assets[marketKey]!.weight / 1000)
       .minus(new Decimal(1));
     const weight = this.balances[marketKey]!.decimal.mul(
-      this.state.assets[marketKey]!.indexPrice.decimal,
+      this.state.assets[marketKey]!.indexPrice.decimal
     ).abs();
     const weightedBorrow = weight.mul(factor);
     return { weight, weightedBorrow };
